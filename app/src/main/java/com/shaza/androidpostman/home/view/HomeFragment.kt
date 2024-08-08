@@ -8,7 +8,7 @@ import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
-import android.view.WindowManager
+import android.widget.Toast
 import androidx.core.widget.doOnTextChanged
 import com.shaza.androidpostman.R
 import com.shaza.androidpostman.databinding.FragmentHomeBinding
@@ -18,7 +18,9 @@ import com.shaza.androidpostman.home.view.adapter.AddHeadersAdapter
 import com.shaza.androidpostman.home.view.adapter.RemoveHeader
 import com.shaza.androidpostman.home.viewmodel.HomeViewModel
 import com.shaza.androidpostman.shared.GenericViewModelFactory
+import com.shaza.androidpostman.shared.model.ResourceStatus
 import com.shaza.androidpostman.shared.netowrk.APIClient
+import com.shaza.androidpostman.shared.utils.hideKeyboard
 
 class HomeFragment : Fragment() {
 
@@ -86,6 +88,29 @@ class HomeFragment : Fragment() {
 
     private fun initObservers() {
         // Initialize Observers
+        observeOnResponseResource()
+    }
+
+    private fun observeOnResponseResource(){
+        viewModel.response.observe(viewLifecycleOwner) { resource ->
+            when (resource.status) {
+                is ResourceStatus.Error -> {
+                    binding.progressBar.visibility = GONE
+                    Toast.makeText(requireContext(), resource.error?.message ?: "", Toast.LENGTH_SHORT).show()
+                }
+                ResourceStatus.Idle -> {
+                    binding.progressBar.visibility = GONE
+                }
+                ResourceStatus.Loading -> {
+                    binding.progressBar.visibility = VISIBLE
+                }
+                ResourceStatus.Success -> {
+                    binding.progressBar.visibility = GONE
+                    Toast.makeText(requireContext(), resource.data?.response ?: "", Toast.LENGTH_SHORT).show()
+                }
+
+            }
+        }
     }
 
     private fun onToggleButtonChange(){
@@ -124,6 +149,8 @@ class HomeFragment : Fragment() {
     private fun onSendRequestButtonClicked(){
         binding.sendRequest.setOnClickListener {
             // Send Request
+            hideKeyboard(requireActivity())
+            binding.progressBar.visibility = VISIBLE
             viewModel.sendRequest()
         }
     }

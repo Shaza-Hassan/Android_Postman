@@ -1,28 +1,42 @@
 package com.shaza.androidpostman.home.viewmodel
 
-import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.shaza.androidpostman.home.model.Header
 import com.shaza.androidpostman.home.model.HomeGateway
 import com.shaza.androidpostman.home.model.RequestType
+import com.shaza.androidpostman.shared.model.NetworkResponse
+import com.shaza.androidpostman.shared.model.Resource
 
 class HomeViewModel(
     private val homeGateway: HomeGateway
 ) : ViewModel() {
 
-
     private val _url = MutableLiveData<String>()
+    val url: LiveData<String> = _url
+
     private val _requestType = MutableLiveData<RequestType>()
+    val requestType: LiveData<RequestType> = _requestType
+
     private val _headers = MutableLiveData<MutableList<Header>>()
+    val headers: LiveData<MutableList<Header>> = _headers
+
     private val _body = MutableLiveData<String>()
+    val body: LiveData<String> = _body
+
+    private val _response = MutableLiveData<Resource<NetworkResponse>>()
+    val response: LiveData<Resource<NetworkResponse>> = _response
 
     init {
+        _response.value = Resource.idle()
         _headers.value = mutableListOf()
     }
+
     fun setUrl(url: String) {
         _url.value = url
     }
+
 
     fun setRequestType(type: RequestType) {
         _requestType.value = type
@@ -52,12 +66,6 @@ class HomeViewModel(
         val headers = _headers.value ?: emptyList()
         val body = _body.value
 
-// Log or handle request logic
-        Log.v("HomeViewModel", "sendRequest")
-        Log.v("HomeViewModel", "url: $url")
-        Log.v("HomeViewModel", "requestType: $requestType")
-        Log.v("HomeViewModel", "headers: $headers")
-        Log.v("HomeViewModel", "body: $body")
 
         val requestHeaders = mutableMapOf<String, String>()
         headers.map {
@@ -65,10 +73,11 @@ class HomeViewModel(
                 requestHeaders[it.title!!] = it.value!!
             }
         }
-        Thread {
-            val networkResponse = homeGateway.makeRequest(url, requestType, requestHeaders, body)
-            Log.v("HomeViewModel", "NetworkResponse: $networkResponse")
-        }.start()
 
+        Thread {
+            _response.postValue(Resource.loading())
+            val networkResponse = homeGateway.makeRequest(url, requestType, requestHeaders, body)
+            _response.postValue(Resource.success(networkResponse))
+        }.start()
     }
 }

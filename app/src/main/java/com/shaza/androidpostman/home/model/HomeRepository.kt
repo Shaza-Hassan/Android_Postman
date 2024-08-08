@@ -1,7 +1,6 @@
 package com.shaza.androidpostman.home.model
 
 import com.shaza.androidpostman.shared.model.NetworkResponse
-import com.shaza.androidpostman.shared.netowrk.APIClient
 import com.shaza.androidpostman.shared.netowrk.HTTPClient
 
 /**
@@ -18,11 +17,5 @@ class HomeRepository(
         body: String?
     ): NetworkResponse {
         return httpClient.makeRequest(url, requestType, headers, body)
-    }
-
-    companion object {
-        fun newInstance(): HomeRepository {
-            return HomeRepository(APIClient())
-        }
     }
 }

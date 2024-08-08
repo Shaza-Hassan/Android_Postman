@@ -1,6 +1,5 @@
 package com.shaza.androidpostman.shared.netowrk
 
-import android.net.Uri
 import com.shaza.androidpostman.home.model.RequestType
 import com.shaza.androidpostman.shared.model.NetworkResponse
 
