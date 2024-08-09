@@ -12,6 +12,7 @@ import com.shaza.androidpostman.shared.model.ResourceStatus
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -167,12 +168,12 @@ class HistoryViewModelTest {
     @Test
     fun `set order clause to order by id`(){
         // Arrange
-        val orderClauses = OrderClauses.OrderById
-        val expectedOrderClauses = OrderClauses.OrderById
+        val orderClauses = OrderClauses.OrderByTime
+        val expectedOrderClauses = OrderClauses.OrderByTime
         // Act
         historyViewModel.setOrderClauses(orderClauses)
 
         // Assert
-        assertTrue(historyViewModel.orderClauses == expectedOrderClauses)
+        assertEquals(historyViewModel.getOrderClauses(),expectedOrderClauses)
     }
 }

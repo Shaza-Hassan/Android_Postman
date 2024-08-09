@@ -27,6 +27,7 @@ import com.shaza.androidpostman.shared.database.NetworkRequestDBHelper
 import com.shaza.androidpostman.shared.model.ResourceStatus
 import com.shaza.androidpostman.shared.netowrk.APIClient
 import com.shaza.androidpostman.shared.netowrk.HTTPClient
+import com.shaza.androidpostman.shared.utils.ConnectivityChecker
 import com.shaza.androidpostman.shared.utils.hideKeyboard
 
 class HomeFragment : Fragment() {
@@ -35,9 +36,9 @@ class HomeFragment : Fragment() {
         fun newInstance() = HomeFragment()
     }
 
-    private lateinit var  apiClient: HTTPClient
+    private lateinit var apiClient: HTTPClient
 
-    private lateinit var homeRepository : HomeGateway
+    private lateinit var homeRepository: HomeGateway
 
     lateinit var viewModel: HomeViewModel
     private lateinit var binding: FragmentHomeBinding
@@ -58,7 +59,11 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         apiClient = APIClient()
-        homeRepository = HomeRepository(apiClient, AddRequestInDB(NetworkRequestDBHelper.getInstance(requireContext())))
+        homeRepository = HomeRepository(
+            apiClient,
+            AddRequestInDB(NetworkRequestDBHelper.getInstance(requireContext())),
+            ConnectivityChecker(requireContext())
+        )
         val viewModelFactory = GenericViewModelFactory(HomeViewModel::class.java) {
             HomeViewModel(homeRepository)
         }
@@ -102,28 +107,35 @@ class HomeFragment : Fragment() {
         observeOnResponseResource()
     }
 
-    private fun observeOnResponseResource(){
+    private fun observeOnResponseResource() {
         viewModel.response.observe(viewLifecycleOwner) { resource ->
             when (resource.status) {
                 is ResourceStatus.Error -> {
                     binding.progressBar.visibility = GONE
-                    Toast.makeText(requireContext(), resource.error?.message ?: "", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        requireContext(),
+                        resource.error?.message ?: "",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
+
                 ResourceStatus.Idle -> {
                     binding.progressBar.visibility = GONE
                 }
+
                 ResourceStatus.Loading -> {
                     binding.progressBar.visibility = VISIBLE
                 }
+
                 ResourceStatus.Success -> {
                     binding.progressBar.visibility = GONE
                     resource.data?.let {
                         // Open Request Info Fragment
-                         val requestInfoFragment = RequestInfoFragment.newInstance(it)
-                            requireActivity().supportFragmentManager.beginTransaction()
-                                .add(R.id.main, requestInfoFragment)
-                                .addToBackStack(null)
-                                .commit()
+                        val requestInfoFragment = RequestInfoFragment.newInstance(it)
+                        requireActivity().supportFragmentManager.beginTransaction()
+                            .add(R.id.main, requestInfoFragment)
+                            .addToBackStack(null)
+                            .commit()
                     } ?: run {
                         Toast.makeText(requireContext(), "No Data Found", Toast.LENGTH_SHORT).show()
                     }
@@ -133,9 +145,9 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun onHistoryIconClicked(){
+    private fun onHistoryIconClicked() {
         binding.toolbar.setOnMenuItemClickListener {
-            when(it.itemId){
+            when (it.itemId) {
                 R.id.history_menu_item -> {
                     // Open History Fragment
                     val historyFragment = HistoryFragment.newInstance()
@@ -149,7 +161,7 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun onToggleButtonChange(){
+    private fun onToggleButtonChange() {
         binding.httpRequestType.httpTypeRadioGroup.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
                 R.id.get_button -> {
@@ -165,41 +177,41 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun showHideBodyRequest(isShow: Boolean){
-        if (isShow){
+    private fun showHideBodyRequest(isShow: Boolean) {
+        if (isShow) {
             binding.bodyOfPostRequestLayout.visibility = VISIBLE
         } else {
             binding.bodyOfPostRequestLayout.visibility = GONE
         }
     }
 
-    private fun addNewHeaderButtonClickListener(){
+    private fun addNewHeaderButtonClickListener() {
         binding.headers.addNewHeader.setOnClickListener {
             viewModel.addHeader()
             adapter.notifyDataSetChanged()
         }
     }
 
-    private fun onSendRequestButtonClicked(){
+    private fun onSendRequestButtonClicked() {
         binding.sendRequest.setOnClickListener {
             // Send Request
             hideKeyboard(requireActivity())
             binding.progressBar.visibility = VISIBLE
-            viewModel.sendRequest()
+            viewModel.onSendRequestClicked()
         }
     }
 
-    private fun onButtonAddFileClick(){
+    private fun onButtonAddFileClick() {
 
     }
 
-    private fun onUrlEditTextChange(){
+    private fun onUrlEditTextChange() {
         binding.urlEditText.doOnTextChanged { text, _, _, _ ->
             viewModel.setUrl(text.toString())
         }
     }
 
-    private fun onBodyEditTextChange(){
+    private fun onBodyEditTextChange() {
         binding.bodyEditText.doOnTextChanged { text, _, _, _ ->
             viewModel.setBody(text.toString())
         }

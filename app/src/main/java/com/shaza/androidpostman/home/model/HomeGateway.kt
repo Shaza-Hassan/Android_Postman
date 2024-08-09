@@ -14,4 +14,6 @@ interface HomeGateway {
     ): NetworkResponse
 
     fun addToDB(networkResponse: NetworkResponse)
+
+    fun isConnected(): Boolean
 }

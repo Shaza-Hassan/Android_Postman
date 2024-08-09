@@ -1,5 +1,6 @@
 package com.shaza.androidpostman.history.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -16,7 +17,6 @@ class HistoryViewModel(private val historyGateway: HistoryGateway) : ViewModel()
     val whereClause: List<WhereClauses>  = _whereClause
 
     private var _orderClauses : OrderClauses = OrderClauses.OrderById
-    val orderClauses: OrderClauses = _orderClauses
 
     private val _requests = MutableLiveData<Resource<List<NetworkResponse>>>()
 
@@ -46,15 +46,19 @@ class HistoryViewModel(private val historyGateway: HistoryGateway) : ViewModel()
     }
 
     fun setOrderClauses(orderClauses: OrderClauses) {
-        this._orderClauses = orderClauses
+        _orderClauses = orderClauses
         getAllRequests()
+    }
+
+    fun getOrderClauses(): OrderClauses {
+        return _orderClauses
     }
 
     fun getAllRequests() {
         Executors.newSingleThreadExecutor().execute {
             _requests.postValue(Resource.loading())
 
-            val requests = historyGateway.getHistory(whereClause, orderClauses)
+            val requests = historyGateway.getHistory(whereClause, getOrderClauses())
 
             _requests.postValue(Resource.success(requests))
         }
