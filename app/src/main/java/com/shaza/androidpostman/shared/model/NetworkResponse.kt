@@ -9,34 +9,19 @@ import kotlinx.parcelize.Parcelize
  */
 @Parcelize
 data class NetworkResponse(
-    override var url: String? = null,
-    override var requestType: RequestType? = null,
-    override var queryParameters: Map<String, String>? = null,
-    override var requestHeaders: Map<String, String>? = null,
-    override var responseHeaders: Map<String, String>? = null,
-    override var body: String? = null,
-    override var responseCode: Int? = null,
-    override var elapsedTime: Long? = null,
-    override var response: String? = null,
-    override var error: String? = null
-) : NetworkResponseInterface {
+    var url: String? = null,
+    var requestType: RequestType? = null,
+    var queryParameters: Map<String, String>? = null,
+    var requestHeaders: Map<String, String>? = null,
+    var responseHeaders: Map<String, String>? = null,
+    var body: String? = null,
+    var responseCode: Int? = null,
+    var elapsedTime: Long? = null,
+    var response: String? = null,
+    var error: String? = null
+) : Parcelable {
 
-    override fun isSuccessful(): Boolean {
+    fun isSuccessful(): Boolean {
         return responseCode in 200..299
     }
-}
-
-// create interface for this data class
-interface NetworkResponseInterface : Parcelable {
-    val url: String?
-    val requestType: RequestType?
-    val queryParameters: Map<String, String>?
-    val requestHeaders: Map<String, String>?
-    val responseHeaders: Map<String, String>?
-    val body: String?
-    val responseCode: Int?
-    val elapsedTime: Long?
-    val response: String?
-    val error: String?
-    fun isSuccessful(): Boolean
 }

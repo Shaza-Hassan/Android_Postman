@@ -16,14 +16,14 @@ import com.shaza.androidpostman.R
 import com.shaza.androidpostman.databinding.FragmentRequestInfoBinding
 import com.shaza.androidpostman.home.model.RequestType
 import com.shaza.androidpostman.requestInfo.viewmodel.RequestInfoViewModel
+import com.shaza.androidpostman.requestInfo.viewmodel.RequestInfoViewModelInterface
 import com.shaza.androidpostman.shared.model.NetworkResponse
-import com.shaza.androidpostman.shared.model.NetworkResponseInterface
 
 class RequestInfoFragment : Fragment() {
 
     companion object {
         fun newInstance(
-            networkResponse: NetworkResponseInterface
+            networkResponse: NetworkResponse
         ) : RequestInfoFragment {
             val fragment = RequestInfoFragment()
             val bundle = Bundle()
@@ -33,7 +33,7 @@ class RequestInfoFragment : Fragment() {
         }
     }
 
-    private val viewModel: RequestInfoViewModel by viewModels()
+    lateinit var viewModel : RequestInfoViewModelInterface
     private lateinit var binding: FragmentRequestInfoBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,6 +50,8 @@ class RequestInfoFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        viewModel = viewModels<RequestInfoViewModel>().value
+
         arguments?.let {
             viewModel.extractData(it)
         }

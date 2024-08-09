@@ -20,7 +20,6 @@ import com.shaza.androidpostman.home.model.RequestType
 import com.shaza.androidpostman.home.view.adapter.AddHeadersAdapter
 import com.shaza.androidpostman.home.view.adapter.RemoveHeader
 import com.shaza.androidpostman.home.viewmodel.HomeViewModel
-import com.shaza.androidpostman.home.viewmodel.HomeViewModelInterface
 import com.shaza.androidpostman.requestInfo.view.RequestInfoFragment
 import com.shaza.androidpostman.shared.GenericViewModelFactory
 import com.shaza.androidpostman.shared.database.AddRequestInDB
@@ -40,7 +39,7 @@ class HomeFragment : Fragment() {
 
     private lateinit var homeRepository : HomeGateway
 
-    lateinit var viewModel: HomeViewModelInterface
+    lateinit var viewModel: HomeViewModel
     private lateinit var binding: FragmentHomeBinding
     private lateinit var adapter: AddHeadersAdapter
 
@@ -151,7 +150,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun onToggleButtonChange(){
-        binding.httpRequestType.httpTypeRadioGroup.setOnCheckedChangeListener { group, checkedId ->
+        binding.httpRequestType.httpTypeRadioGroup.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
                 R.id.get_button -> {
                     viewModel.setRequestType(RequestType.GET)

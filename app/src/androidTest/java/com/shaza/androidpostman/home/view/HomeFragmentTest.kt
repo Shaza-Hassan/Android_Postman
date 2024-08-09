@@ -1,41 +1,27 @@
 package com.shaza.androidpostman.home.view
 
-import androidx.fragment.app.testing.FragmentScenario
-import androidx.lifecycle.Lifecycle
 import androidx.recyclerview.widget.RecyclerView
-import androidx.test.core.app.ActivityScenario
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.action.ViewActions.*
+import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.action.ViewActions.closeSoftKeyboard
+import androidx.test.espresso.action.ViewActions.pressBack
+import androidx.test.espresso.action.ViewActions.scrollTo
+import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.contrib.RecyclerViewActions.actionOnItemAtPosition
-import androidx.test.espresso.matcher.ViewMatchers.*
-import androidx.test.filters.MediumTest
+import androidx.test.espresso.matcher.ViewMatchers.hasDescendant
+import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
+import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.espresso.matcher.ViewMatchers.withText
+import androidx.test.ext.junit.rules.ActivityScenarioRule
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.shaza.androidpostman.MainActivity
+import com.shaza.androidpostman.R
+import com.shaza.androidpostman.utils.typeTextInChildViewWithId
+import org.hamcrest.CoreMatchers.not
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import com.shaza.androidpostman.R
-import androidx.test.ext.junit.rules.ActivityScenarioRule
-import androidx.test.platform.app.InstrumentationRegistry
-import androidx.test.uiautomator.UiDevice
-import androidx.test.uiautomator.UiSelector
-import com.shaza.androidpostman.MainActivity
-import com.shaza.androidpostman.home.model.Header
-import com.shaza.androidpostman.home.viewmodel.HomeViewModel
-import com.shaza.androidpostman.home.viewmodel.HomeViewModelInterface
-import com.shaza.androidpostman.requestInfo.view.RequestInfoFragment
-import com.shaza.androidpostman.shared.model.NetworkResponse
-import com.shaza.androidpostman.shared.model.Resource
-import com.shaza.androidpostman.shared.model.ResourceStatus
-import com.shaza.androidpostman.utils.LiveDataTestUtil
-import com.shaza.androidpostman.utils.typeTextInChildViewWithId
-import junit.framework.TestCase.assertTrue
-import org.junit.Rule
-import org.hamcrest.CoreMatchers.not
-import org.junit.Before
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.`when`
-import org.mockito.MockitoAnnotations
 
 /**
  * Created by Shaza Hassan on 2024/Aug/08.

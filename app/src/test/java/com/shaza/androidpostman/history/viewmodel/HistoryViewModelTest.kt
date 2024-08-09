@@ -8,13 +8,14 @@ import com.shaza.androidpostman.shared.database.OrderClauses
 import com.shaza.androidpostman.shared.database.WhereClauses
 import com.shaza.androidpostman.shared.model.NetworkResponse
 import com.shaza.androidpostman.shared.model.Resource
+import com.shaza.androidpostman.shared.model.ResourceStatus
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import junit.framework.TestCase.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.verify
-import org.mockito.Mockito.`when`
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
@@ -27,11 +28,11 @@ class HistoryViewModelTest {
 
     private lateinit var historyGateway: HistoryGateway
     private lateinit var historyViewModel: HistoryViewModel
-    private val observer: Observer<Resource<List<NetworkResponse>>> = mock()
+    private val observer = mockk<Observer<Resource<List<NetworkResponse>>>>(relaxed = true)
 
     @Before
     fun setUp() {
-        historyGateway = mock(HistoryGateway::class.java)
+        historyGateway = mockk()
         historyViewModel = HistoryViewModel(historyGateway)
         historyViewModel.requests.observeForever(observer)
     }
@@ -39,22 +40,29 @@ class HistoryViewModelTest {
     @Test
     fun `test getAllRequests updates LiveData with success`() {
         // Arrange
-        val whereClauses = listOf(WhereClauses.GetAllRequest)
-        val orderClauses = OrderClauses.OrderById
         val expectedResponses = listOf(
             NetworkResponse(url = "http://example.com", requestType = RequestType.GET, requestHeaders = emptyMap(), body = "{}")
         )
-        `when`(historyGateway.getHistory(whereClauses, orderClauses))
-            .thenReturn(expectedResponses)
-        val latch = CountDownLatch(2) // One for loading and one for success
+        every { historyGateway.getHistory(any(), eq(OrderClauses.OrderById)) } returns expectedResponses
+        historyViewModel.getAllRequests()
+
+        val latch = CountDownLatch(1) // Waiting for success callback
+
+        every { observer.onChanged(any()) } answers {
+            if (firstArg<Resource<List<NetworkResponse>>>().status == ResourceStatus.Success) {
+                latch.countDown() // Release the latch when success is posted
+            }
+        }
 
         // Act
         historyViewModel.getAllRequests()
 
         // Assert
-        verify(observer).onChanged(Resource.loading())
+        verify { historyGateway.getHistory(any(), eq(OrderClauses.OrderById)) }
+        verify { observer.onChanged(Resource.loading()) }
         latch.await(2, TimeUnit.SECONDS) // Wait for up to 2 seconds
-        verify(observer).onChanged(Resource.success(expectedResponses))
+        verify { observer.onChanged(Resource.success(expectedResponses)) }
+
     }
 
     @Test

@@ -9,7 +9,7 @@ class SelectFromDB(private val dbHelper: NetworkRequestDBHelper) {
 
     fun getAllRequests(
         whereClause: List<WhereClauses>,
-        sortedBy: OrderClauses?
+        sortedBy: OrderClauses
     ): List<NetworkResponse> {
         val query = DBQueryBuilder.buildQuery(whereClause, sortedBy)
         val cursor = dbHelper.writableDatabase.rawQuery(query, null)

@@ -5,21 +5,19 @@ import androidx.lifecycle.Observer
 import com.shaza.androidpostman.home.model.Header
 import com.shaza.androidpostman.home.model.HomeGateway
 import com.shaza.androidpostman.home.model.RequestType
-import com.shaza.androidpostman.shared.database.AddRequestInDB
 import com.shaza.androidpostman.shared.model.NetworkResponse
 import com.shaza.androidpostman.shared.model.Resource
 import com.shaza.androidpostman.shared.model.ResourceStatus
+import io.mockk.Runs
+import io.mockk.every
+import io.mockk.just
+import io.mockk.mockk
+import io.mockk.verify
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.mock
-import org.junit.runner.RunWith
-import org.mockito.ArgumentMatchers.anyMap
-import org.mockito.Mockito.verify
-import org.mockito.Mockito.`when`
-import org.mockito.junit.MockitoJUnitRunner
-import org.mockito.kotlin.eq
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
@@ -27,7 +25,6 @@ import java.util.concurrent.TimeUnit
  * Created by Shaza Hassan on 2024/Aug/08.
  */
 
-@RunWith(MockitoJUnitRunner::class)
 class HomeViewModelTest {
 
     @get:Rule
@@ -35,15 +32,16 @@ class HomeViewModelTest {
 
     private lateinit var viewModel: HomeViewModel
     private lateinit var mockHomeGateway: HomeGateway
+    private val observer = mockk<Observer<Resource<NetworkResponse>>>(relaxed = true)
 
     @Before
     fun setUp() {
-        mockHomeGateway = mock(HomeGateway::class.java)
+        mockHomeGateway = mockk()
         viewModel = HomeViewModel(mockHomeGateway)
     }
 
     @Test
-    fun `test set url`(){
+    fun `test set url`() {
         val testUrl = "http://example.com"
         viewModel.setUrl(testUrl)
         assertEquals(testUrl, viewModel.url.value)
@@ -77,49 +75,49 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun sendRequest_updatesResponseLiveData() {
-        val testUrl = "http://example.com"
-        val testType = RequestType.GET
-        val testHeaders = listOf(Header("key", "value"))
-        val headers = testHeaders.map { it.title to it.value }.toMap() as Map<String, String>
-        val testBody = "test body"
-        val testResponse = NetworkResponse(
-            url = testUrl,
-            requestType = testType,
-            responseHeaders = headers,
-            response = testBody,
-        )
+    fun `sendRequest updates LiveData with success`() {
+        // Arrange
+        val url = "http://example.com"
+        val requestType = RequestType.GET
+        val headers = listOf<Header>()
+        val body = ""
+        val networkResponse =
+            NetworkResponse(url, requestType, requestHeaders = headers.associate { it.title!! to it.value!! }, body = body)
 
-        `when`(mockHomeGateway.makeRequest(
-            eq(testUrl),
-            eq(testType),
-            anyMap(),
-            eq(testBody)
-        )).thenReturn(testResponse)
-
-
-        viewModel.setUrl(testUrl)
-        viewModel.setRequestType(testType)
-        testHeaders.forEach { viewModel.addHeader() }
-        viewModel.setBody(testBody)
-
-        val latch = CountDownLatch(1)
-        val observer = Observer<Resource<NetworkResponse>> { resource ->
-            if (resource.status == ResourceStatus.Success) {
-                latch.countDown()
-            }
-        }
+        viewModel.setBody(body)
         viewModel.response.observeForever(observer)
 
+        every {
+            mockHomeGateway.makeRequest(
+                url,
+                requestType,
+                headers.associate { it.title!! to it.value!! },
+                body
+            )
+        } returns networkResponse
+        every { mockHomeGateway.addToDB(networkResponse) } just Runs
+
+        // Set ViewModel state
+        viewModel.setUrl(url)
+        viewModel.setRequestType(requestType)
+
+        // Act
         viewModel.sendRequest()
 
-        latch.await(5, TimeUnit.SECONDS)
-        verify(mockHomeGateway).makeRequest(
-            eq(testUrl),
-            eq(testType),
-            anyMap(), // Allows any map for headers
-            eq(testBody)
-        )
-        viewModel.response.removeObserver(observer)
+        val latch = CountDownLatch(1) // To wait for the background thread to finish
+
+        every { observer.onChanged(any()) } answers {
+            if (firstArg<Resource<NetworkResponse>>().status == ResourceStatus.Success) {
+                latch.countDown() // Release the latch when success is posted
+            }
+        }
+
+        // Assert
+        verify { mockHomeGateway.makeRequest(url, requestType, headers.associate { it.title!! to it.value!! }, body) }
+        verify { observer.onChanged(Resource.loading()) }
+        latch.await(2, TimeUnit.SECONDS) // Wait for the background thread to complete
+        verify { observer.onChanged(Resource.success(networkResponse)) }
+        verify { mockHomeGateway.addToDB(networkResponse) }
     }
+
 }

@@ -5,14 +5,12 @@ import com.shaza.androidpostman.shared.database.OrderClauses
 import com.shaza.androidpostman.shared.database.SelectFromDB
 import com.shaza.androidpostman.shared.database.WhereClauses
 import com.shaza.androidpostman.shared.model.NetworkResponse
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
-import org.mockito.ArgumentMatchers.anyList
-import org.mockito.Mock
-import org.mockito.Mockito.verify
-import org.mockito.Mockito.`when`
-import org.mockito.MockitoAnnotations
 
 /**
  * Created by Shaza Hassan on 2024/Aug/09.
@@ -20,15 +18,14 @@ import org.mockito.MockitoAnnotations
 
 class HistoryRepositoryTest {
 
-    @Mock
+
     lateinit var mockSelectFromDB: SelectFromDB
 
-    @Mock
     lateinit var historyRepository: HistoryRepository
 
     @Before
     fun setUp() {
-        MockitoAnnotations.openMocks(this)
+        mockSelectFromDB = mockk()
         historyRepository = HistoryRepository(mockSelectFromDB)
     }
 
@@ -42,12 +39,13 @@ class HistoryRepositoryTest {
             NetworkResponse(url = "http://example.com", requestType = RequestType.GET, requestHeaders = emptyMap(), body = "{}"),
         )
 
-        `when`(mockSelectFromDB.getAllRequests(listOf(), orderClauses))
-            .thenReturn(expectedResponse)
+        every { mockSelectFromDB.getAllRequests(listOf(), orderClauses) } returns expectedResponse
+
 
         val result = historyRepository.getHistory(listOf(), orderClauses)
 
         assertEquals(expectedResponse, result)
-        verify(mockSelectFromDB).getAllRequests(whereClauses, orderClauses)
+
+        verify { mockSelectFromDB.getAllRequests(whereClauses, orderClauses) }
     }
 }

@@ -3,11 +3,11 @@ package com.shaza.androidpostman.home.model
 import com.shaza.androidpostman.shared.database.AddRequestInDB
 import com.shaza.androidpostman.shared.model.NetworkResponse
 import com.shaza.androidpostman.shared.netowrk.HTTPClient
+import io.mockk.every
+import io.mockk.mockk
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.`when`
 
 /**
  * Created by Shaza Hassan on 2024/Aug/08.
@@ -20,8 +20,8 @@ class HomeRepositoryTest {
 
     @Before
     fun setUp() {
-        mockHttpClient = mock()
-        addRequestInDB = mock()
+        mockHttpClient = mockk()
+        addRequestInDB = mockk()
         homeRepository = HomeRepository(mockHttpClient, addRequestInDB)
     }
 
@@ -41,7 +41,7 @@ class HomeRepositoryTest {
             response = "response body"
         )
 
-        `when`(mockHttpClient.makeRequest(url, requestType, headers, body)).thenReturn(expectedResponse)
+        every { mockHttpClient.makeRequest(url,requestType,headers,body) } returns expectedResponse
 
         // Act
         val actualResponse = homeRepository.makeRequest(url, requestType, headers, body)
@@ -66,8 +66,7 @@ class HomeRepositoryTest {
             response = "POST response body"
         )
 //            NetworkResponse.Success("POST response body")
-
-        `when`(mockHttpClient.makeRequest(url, requestType, headers, body)).thenReturn(expectedResponse)
+        every { mockHttpClient.makeRequest(url,requestType,headers,body) } returns expectedResponse
 
         // Act
         val actualResponse = homeRepository.makeRequest(url, requestType, headers, body)
@@ -85,7 +84,7 @@ class HomeRepositoryTest {
         val body = null
 
         // Mock the behavior of the HTTPClient to throw an exception
-        `when`(mockHttpClient.makeRequest(url, requestType, headers, body)).thenThrow(Exception("Network error"))
+        every { mockHttpClient.makeRequest(url,requestType,headers,body) } throws Exception("Network error")
 
         // Act
         homeRepository.makeRequest(url, requestType, headers, body)
@@ -108,7 +107,7 @@ class HomeRepositoryTest {
         )
 
         // Mock the behavior of the HTTPClient to return an error response
-        `when`(mockHttpClient.makeRequest(url, requestType, headers, body)).thenReturn(expectedResponse)
+        every { mockHttpClient.makeRequest(url,requestType,headers,body) } returns expectedResponse
 
         // Act
         val actualResponse = homeRepository.makeRequest(url, requestType, headers, body)
@@ -135,7 +134,7 @@ class HomeRepositoryTest {
         )
 
         // Mock the behavior of the HTTPClient to return an error response
-        `when`(mockHttpClient.makeRequest(url, requestType, headers, body)).thenReturn(expectedResponse)
+        every { mockHttpClient.makeRequest(url,requestType,headers,body) } returns expectedResponse
 
         // Act
         val actualResponse = homeRepository.makeRequest(url, requestType, headers, body)

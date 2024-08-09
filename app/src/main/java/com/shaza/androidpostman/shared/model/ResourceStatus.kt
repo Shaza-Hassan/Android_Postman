@@ -5,8 +5,8 @@ package com.shaza.androidpostman.shared.model
  */
 
 sealed class ResourceStatus {
-    object Idle : ResourceStatus()
-    object Loading : ResourceStatus()
-    object Success : ResourceStatus()
+    data object Idle : ResourceStatus()
+    data object Loading : ResourceStatus()
+    data object Success : ResourceStatus()
     data class Error(val error: Throwable) : ResourceStatus()
 }

@@ -13,15 +13,14 @@ legacySupportV4 = "1.0.0"
 lifecycleLivedataKtx = "2.8.4"
 lifecycleViewmodelKtx = "2.8.4"
 fragmentKtx = "1.8.2"
-mockitoCore = "5.12.0"
-mockitoInline = "5.2.0"
-mockitoKotlin = "5.4.0"
 coreTesting = "2.2.0"
 junitKtx = "1.2.1"
 fragmentTesting = "1.8.2"
 espressoContrib = "3.6.1"
 uiautomator = "2.3.0"
-mockitoAndroid = "5.12.0"
+mockk = "1.13.12"
+mockkAndroid = "1.13.12"
+mockkAgent = "1.13.12"
 
 
 [libraries]
@@ -37,15 +36,14 @@ androidx-legacy-support-v4 = { group = "androidx.legacy", name = "legacy-support
 androidx-lifecycle-livedata-ktx = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "lifecycleLivedataKtx" }
 androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtx" }
 androidx-fragment-ktx = { group = "androidx.fragment", name = "fragment-ktx", version.ref = "fragmentKtx" }
-mockito-core = { group = "org.mockito", name = "mockito-core", version.ref = "mockitoCore" }
-mockito-inline = { group = "org.mockito", name = "mockito-inline", version.ref = "mockitoInline" }
-mockito-kotlin = { group = "org.mockito.kotlin", name = "mockito-kotlin", version.ref = "mockitoKotlin" }
 androidx-core-testing = { group = "androidx.arch.core", name = "core-testing", version.ref = "coreTesting" }
 androidx-junit-ktx = { group = "androidx.test.ext", name = "junit-ktx", version.ref = "junitKtx" }
 androidx-fragment-testing = { group = "androidx.fragment", name = "fragment-testing", version.ref = "fragmentTesting" }
 androidx-espresso-contrib = { group = "androidx.test.espresso", name = "espresso-contrib", version.ref = "espressoContrib" }
 androidx-uiautomator = { group = "androidx.test.uiautomator", name = "uiautomator", version.ref = "uiautomator" }
-mockito-android = { group = "org.mockito", name = "mockito-android", version.ref = "mockitoAndroid" }
+mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
+mockk-android = { group = "io.mockk", name = "mockk-android", version.ref = "mockkAndroid" }
+mockk-agent = { group = "io.mockk", name = "mockk-agent", version.ref = "mockkAgent" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

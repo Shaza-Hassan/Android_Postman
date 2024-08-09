@@ -8,6 +8,7 @@ import com.shaza.androidpostman.shared.database.OrderClauses
 import com.shaza.androidpostman.shared.database.WhereClauses
 import com.shaza.androidpostman.shared.model.NetworkResponse
 import com.shaza.androidpostman.shared.model.Resource
+import java.util.concurrent.Executors
 
 class HistoryViewModel(private val historyGateway: HistoryGateway) : ViewModel() {
 
@@ -50,12 +51,12 @@ class HistoryViewModel(private val historyGateway: HistoryGateway) : ViewModel()
     }
 
     fun getAllRequests() {
-        Thread {
+        Executors.newSingleThreadExecutor().execute {
             _requests.postValue(Resource.loading())
 
             val requests = historyGateway.getHistory(whereClause, orderClauses)
 
             _requests.postValue(Resource.success(requests))
-        }.start()
+        }
     }
 }

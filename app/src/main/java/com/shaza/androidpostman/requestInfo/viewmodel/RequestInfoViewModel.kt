@@ -9,14 +9,15 @@ import androidx.lifecycle.ViewModel
 import com.shaza.androidpostman.shared.model.NetworkResponse
 import com.shaza.androidpostman.shared.utils.SdkVersionProvider
 
-class RequestInfoViewModel(private val sdkVersionProvider: SdkVersionProvider = SdkVersionProvider()) : ViewModel() {
+class RequestInfoViewModel(private val sdkVersionProvider: SdkVersionProvider = SdkVersionProvider())
+    : ViewModel() , RequestInfoViewModelInterface {
 
 
     private var _networkResponse: MutableLiveData<NetworkResponse> = MutableLiveData()
-    val networkResponse: LiveData<NetworkResponse> = _networkResponse
-    val sdk = sdkVersionProvider.getSdkInt()
+    override val networkResponse: LiveData<NetworkResponse> = _networkResponse
+    override val sdk = sdkVersionProvider.getSdkInt()
 
-    fun extractData(bundle: Bundle) {
+    override fun extractData(bundle: Bundle) {
 
         if (sdk >= Build.VERSION_CODES.TIRAMISU) {
             extractDataFromBundle(bundle)
@@ -35,4 +36,11 @@ class RequestInfoViewModel(private val sdkVersionProvider: SdkVersionProvider = 
     private fun extractDataFromBundleOld(bundle: Bundle) {
         _networkResponse.value = bundle.getParcelable("networkResponse")
     }
+}
+
+interface RequestInfoViewModelInterface {
+    val networkResponse: LiveData<NetworkResponse>
+    val sdk: Int
+
+    fun extractData(bundle: Bundle)
 }

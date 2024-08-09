@@ -6,10 +6,13 @@ package com.shaza.androidpostman.network
 
 import com.shaza.androidpostman.home.model.RequestType
 import com.shaza.androidpostman.shared.netowrk.ResponseHandler
+import io.mockk.Runs
+import io.mockk.every
+import io.mockk.just
+import io.mockk.mockk
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
-import org.mockito.Mockito.*
 import java.io.ByteArrayInputStream
 import java.net.HttpURLConnection
 import java.net.URL
@@ -21,15 +24,15 @@ class ResponseHandlerTest {
         // Arrange
         val headers = mapOf("Content-Type" to "application/json")
         val requestBody = "{\"key\":\"value\"}"
-        val mockConnection = mock(HttpURLConnection::class.java)
+        val mockConnection = mockk<HttpURLConnection>()
         val inputStream = ByteArrayInputStream("response body".toByteArray())
 
-
-        `when`(mockConnection.url).thenReturn(java.net.URL("http://example.com"))
-        `when`(mockConnection.requestMethod).thenReturn("GET")
-        `when`(mockConnection.responseCode).thenReturn(200)
-        `when`(mockConnection.headerFields).thenReturn(mapOf("Content-Type" to listOf("application/json")))
-        `when`(mockConnection.inputStream).thenReturn(inputStream)
+        every { mockConnection.url } returns URL("http://example.com")
+        every { mockConnection.requestMethod } returns "GET"
+        every { mockConnection.responseCode } returns 200
+        every { mockConnection.headerFields } returns mapOf("Content-Type" to listOf("application/json"))
+        every { mockConnection.inputStream } returns inputStream
+        every { mockConnection.disconnect() } just Runs // Add this line to handle disconnect()
 
         // Act
         val result = ResponseHandler.handleResponse(headers, requestBody, mockConnection)
@@ -50,11 +53,12 @@ class ResponseHandlerTest {
         // Arrange
         val headers = mapOf("Content-Type" to "application/json")
         val requestBody = "{\"key\":\"value\"}"
-        val mockConnection = mock(HttpURLConnection::class.java)
+        val mockConnection = mockk<HttpURLConnection>()
 
-        `when`(mockConnection.url).thenReturn(java.net.URL("http://example.com"))
-        `when`(mockConnection.requestMethod).thenReturn("POST")
-        `when`(mockConnection.responseCode).thenThrow(RuntimeException("Connection failed"))
+        every { mockConnection.url } returns URL("http://example.com")
+        every { mockConnection.requestMethod } returns "POST"
+        every { mockConnection.responseCode } throws RuntimeException("Connection failed")
+        every { mockConnection.disconnect() } just Runs // Add this line to handle disconnect()
 
         // Act
         val result = ResponseHandler.handleResponse(headers, requestBody, mockConnection)
@@ -73,14 +77,15 @@ class ResponseHandlerTest {
         // Arrange
         val headers = mapOf("Content-Type" to "application/json")
         val requestBody = "{\"key\":\"value\"}"
-        val mockConnection = mock(HttpURLConnection::class.java)
+        val mockConnection = mockk<HttpURLConnection>()
         val errorStream = ByteArrayInputStream("error message".toByteArray())
 
-        `when`(mockConnection.url).thenReturn(URL("http://example.com"))
-        `when`(mockConnection.requestMethod).thenReturn("POST")
-        `when`(mockConnection.responseCode).thenReturn(500)
-        `when`(mockConnection.headerFields).thenReturn(mapOf("Content-Type" to listOf("application/json")))
-        `when`(mockConnection.errorStream).thenReturn(errorStream)
+        every { mockConnection.url } returns URL("http://example.com")
+        every { mockConnection.requestMethod } returns "POST"
+        every { mockConnection.responseCode } returns 500
+        every { mockConnection.headerFields } returns mapOf("Content-Type" to listOf("application/json"))
+        every { mockConnection.errorStream } returns errorStream
+        every { mockConnection.disconnect() } just Runs // Add this line to handle disconnect()
 
         // Act
         val result = ResponseHandler.handleResponse(headers, requestBody, mockConnection)
