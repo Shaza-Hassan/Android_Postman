@@ -21,6 +21,8 @@ import com.shaza.androidpostman.home.viewmodel.HomeViewModel
 import com.shaza.androidpostman.home.viewmodel.HomeViewModelInterface
 import com.shaza.androidpostman.requestInfo.view.RequestInfoFragment
 import com.shaza.androidpostman.shared.GenericViewModelFactory
+import com.shaza.androidpostman.shared.database.AddRequestInDB
+import com.shaza.androidpostman.shared.database.NetworkRequestDBHelper
 import com.shaza.androidpostman.shared.model.ResourceStatus
 import com.shaza.androidpostman.shared.netowrk.APIClient
 import com.shaza.androidpostman.shared.utils.hideKeyboard
@@ -53,7 +55,7 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val viewModelFactory = GenericViewModelFactory(HomeViewModel::class.java) {
-            HomeViewModel(homeRepository)
+            HomeViewModel(homeRepository, AddRequestInDB(dbHelper = NetworkRequestDBHelper.getInstance(requireContext())))
         }
         viewModel = ViewModelProvider(this, viewModelFactory)[HomeViewModel::class.java]
         initRecyclerView()

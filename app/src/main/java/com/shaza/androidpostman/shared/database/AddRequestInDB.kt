@@ -7,7 +7,6 @@ import com.shaza.androidpostman.shared.model.NetworkResponse
  * Created by Shaza Hassan on 2024/Aug/09.
  */
 class AddRequestInDB(private val dbHelper: NetworkRequestDBHelper) {
-
     fun addRequestToDataBase(networkResponse: NetworkResponse) {
         val values = RequestMapper.toContentValues(networkResponse)
         dbHelper.writableDatabase.insertWithOnConflict(
@@ -15,5 +14,4 @@ class AddRequestInDB(private val dbHelper: NetworkRequestDBHelper) {
             SQLiteDatabase.CONFLICT_REPLACE
         )
     }
-
 }

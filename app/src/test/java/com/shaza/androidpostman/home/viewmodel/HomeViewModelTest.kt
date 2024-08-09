@@ -5,6 +5,7 @@ import androidx.lifecycle.Observer
 import com.shaza.androidpostman.home.model.Header
 import com.shaza.androidpostman.home.model.HomeGateway
 import com.shaza.androidpostman.home.model.RequestType
+import com.shaza.androidpostman.shared.database.AddRequestInDB
 import com.shaza.androidpostman.shared.model.NetworkResponse
 import com.shaza.androidpostman.shared.model.Resource
 import com.shaza.androidpostman.shared.model.ResourceStatus
@@ -34,11 +35,13 @@ class HomeViewModelTest {
 
     private lateinit var viewModel: HomeViewModel
     private lateinit var mockHomeGateway: HomeGateway
+    private lateinit var addRequestInDB: AddRequestInDB
 
     @Before
     fun setUp() {
         mockHomeGateway = mock(HomeGateway::class.java)
-        viewModel = HomeViewModel(mockHomeGateway)
+        addRequestInDB = mock()
+        viewModel = HomeViewModel(mockHomeGateway, addRequestInDB)
     }
 
     @Test

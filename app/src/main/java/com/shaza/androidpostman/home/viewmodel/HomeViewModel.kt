@@ -7,11 +7,13 @@ import androidx.lifecycle.ViewModel
 import com.shaza.androidpostman.home.model.Header
 import com.shaza.androidpostman.home.model.HomeGateway
 import com.shaza.androidpostman.home.model.RequestType
+import com.shaza.androidpostman.shared.database.AddRequestInDB
 import com.shaza.androidpostman.shared.model.NetworkResponse
 import com.shaza.androidpostman.shared.model.Resource
 
 class HomeViewModel(
-    private val homeGateway: HomeGateway
+    private val homeGateway: HomeGateway,
+    private val addRequestInDB: AddRequestInDB
 ) : HomeViewModelInterface, ViewModel() {
 
     private val _url = MutableLiveData<String>()
@@ -77,8 +79,8 @@ class HomeViewModel(
         Thread {
             _response.postValue(Resource.loading())
             val networkResponse = homeGateway.makeRequest(url, requestType, requestHeaders, body)
-            Log.v("HomeViewModel", "Response: $networkResponse")
             _response.postValue(Resource.success(networkResponse))
+            addRequestInDB.addRequestToDataBase(networkResponse)
         }.start()
     }
 }
