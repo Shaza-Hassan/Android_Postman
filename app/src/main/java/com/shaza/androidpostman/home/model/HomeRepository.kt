@@ -1,5 +1,6 @@
 package com.shaza.androidpostman.home.model
 
+import com.shaza.androidpostman.shared.database.AddRequestInDB
 import com.shaza.androidpostman.shared.model.NetworkResponse
 import com.shaza.androidpostman.shared.netowrk.HTTPClient
 
@@ -8,6 +9,7 @@ import com.shaza.androidpostman.shared.netowrk.HTTPClient
  */
 class HomeRepository(
     private val httpClient: HTTPClient,
+    private val addRequestInDB: AddRequestInDB
 ): HomeGateway {
 
     override fun makeRequest(
@@ -17,5 +19,9 @@ class HomeRepository(
         body: String?
     ): NetworkResponse {
         return httpClient.makeRequest(url, requestType, headers, body)
+    }
+
+    override fun addToDB(networkResponse: NetworkResponse) {
+        addRequestInDB.addRequestToDataBase(networkResponse)
     }
 }

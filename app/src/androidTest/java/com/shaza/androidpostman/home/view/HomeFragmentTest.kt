@@ -47,6 +47,13 @@ class HomeFragmentTest {
     @get:Rule
     val activityRule = ActivityScenarioRule(MainActivity::class.java) // Replace with your activity that contains HomeFragment
 
+    @Test
+    fun testOnHistoryButtonClicked(){
+        onView(withId(R.id.history_menu_item)).perform(click())
+        onView(withId(R.id.history_fragment)).check(matches(isDisplayed()))
+        pressBack()
+        onView(withId(R.id.home_fragment)).check(matches(isDisplayed()))
+    }
 
     @Test
     fun testOnPostButtonPressed() {
@@ -148,10 +155,10 @@ class HomeFragmentTest {
             actionOnItemAtPosition<RecyclerView.ViewHolder>(
                 0,
                 typeTextInChildViewWithId(R.id.header_value_edit_text, "Header 1 Text"),
-            ), closeSoftKeyboard()
+            )
         )
 
-        onView(withId(R.id.body_edit_text)).perform(typeText("{'title':'foo','body':'bar','userId':1}"))
+        onView(withId(R.id.body_edit_text)).perform(scrollTo(),typeText("{'title':'foo','body':'bar','userId':1}"))
         onView(withId(R.id.send_request)).perform(click(), closeSoftKeyboard())
         onView(withId(R.id.progress_bar)).check(matches(isDisplayed()))
 

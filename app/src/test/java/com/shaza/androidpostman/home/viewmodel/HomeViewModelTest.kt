@@ -35,13 +35,11 @@ class HomeViewModelTest {
 
     private lateinit var viewModel: HomeViewModel
     private lateinit var mockHomeGateway: HomeGateway
-    private lateinit var addRequestInDB: AddRequestInDB
 
     @Before
     fun setUp() {
         mockHomeGateway = mock(HomeGateway::class.java)
-        addRequestInDB = mock()
-        viewModel = HomeViewModel(mockHomeGateway, addRequestInDB)
+        viewModel = HomeViewModel(mockHomeGateway)
     }
 
     @Test

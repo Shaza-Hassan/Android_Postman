@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/history_card_item"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="8dp"
+        app:cardUseCompatPadding="true">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp">
+
+            <!--            Request type-->
+            <TextView
+                android:id="@+id/request_type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/request_get_type_background"
+                android:padding="10dp"
+                android:textAllCaps="true"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                tools:backgroundTint="@color/post_response_color"
+                tools:text="Get" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/request_status"
+                android:paddingHorizontal="10dp"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:background="@drawable/request_get_type_background"
+                tools:backgroundTint="@color/green"
+                tools:text="Success"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
+
+            <TextView
+                android:id="@+id/request_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="@id/request_status"
+                app:layout_constraintBottom_toBottomOf="@id/request_status"
+                app:layout_constraintStart_toEndOf="@id/request_status"
+                android:layout_marginStart="16dp"
+                tools:text="1000ms"/>
+
+            <TextView
+                android:id="@+id/request_url"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:autoLink="all"
+                android:linksClickable="true"
+                app:layout_constraintTop_toBottomOf="@id/request_status"
+                app:layout_constraintEnd_toStartOf="@id/request_type"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginEnd="8dp"
+                tools:text="URL: https://dummyjson.com/products/1" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,5 +1,6 @@
 package com.shaza.androidpostman.home.model
 
+import com.shaza.androidpostman.shared.database.AddRequestInDB
 import com.shaza.androidpostman.shared.model.NetworkResponse
 import com.shaza.androidpostman.shared.netowrk.HTTPClient
 import org.junit.Assert.assertEquals
@@ -15,11 +16,13 @@ class HomeRepositoryTest {
 
     private lateinit var homeRepository: HomeRepository
     private lateinit var mockHttpClient: HTTPClient
+    private lateinit var addRequestInDB: AddRequestInDB
 
     @Before
     fun setUp() {
         mockHttpClient = mock()
-        homeRepository = HomeRepository(mockHttpClient)
+        addRequestInDB = mock()
+        homeRepository = HomeRepository(mockHttpClient, addRequestInDB)
     }
 
     @Test

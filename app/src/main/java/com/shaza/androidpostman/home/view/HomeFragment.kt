@@ -13,6 +13,8 @@ import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.ViewModelProvider
 import com.shaza.androidpostman.R
 import com.shaza.androidpostman.databinding.FragmentHomeBinding
+import com.shaza.androidpostman.history.view.HistoryFragment
+import com.shaza.androidpostman.home.model.HomeGateway
 import com.shaza.androidpostman.home.model.HomeRepository
 import com.shaza.androidpostman.home.model.RequestType
 import com.shaza.androidpostman.home.view.adapter.AddHeadersAdapter
@@ -25,6 +27,7 @@ import com.shaza.androidpostman.shared.database.AddRequestInDB
 import com.shaza.androidpostman.shared.database.NetworkRequestDBHelper
 import com.shaza.androidpostman.shared.model.ResourceStatus
 import com.shaza.androidpostman.shared.netowrk.APIClient
+import com.shaza.androidpostman.shared.netowrk.HTTPClient
 import com.shaza.androidpostman.shared.utils.hideKeyboard
 
 class HomeFragment : Fragment() {
@@ -33,8 +36,9 @@ class HomeFragment : Fragment() {
         fun newInstance() = HomeFragment()
     }
 
-    private val  apiClient = APIClient()
-    private val homeRepository = HomeRepository(apiClient)
+    private lateinit var  apiClient: HTTPClient
+
+    private lateinit var homeRepository : HomeGateway
 
     lateinit var viewModel: HomeViewModelInterface
     private lateinit var binding: FragmentHomeBinding
@@ -54,8 +58,10 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        apiClient = APIClient()
+        homeRepository = HomeRepository(apiClient, AddRequestInDB(NetworkRequestDBHelper.getInstance(requireContext())))
         val viewModelFactory = GenericViewModelFactory(HomeViewModel::class.java) {
-            HomeViewModel(homeRepository, AddRequestInDB(dbHelper = NetworkRequestDBHelper.getInstance(requireContext())))
+            HomeViewModel(homeRepository)
         }
         viewModel = ViewModelProvider(this, viewModelFactory)[HomeViewModel::class.java]
         initRecyclerView()
@@ -77,6 +83,8 @@ class HomeFragment : Fragment() {
 
     private fun initListener() {
         // Initialize Listener
+        onHistoryIconClicked()
+
         onToggleButtonChange()
 
         addNewHeaderButtonClickListener()
@@ -123,6 +131,22 @@ class HomeFragment : Fragment() {
                 }
 
             }
+        }
+    }
+
+    private fun onHistoryIconClicked(){
+        binding.toolbar.setOnMenuItemClickListener {
+            when(it.itemId){
+                R.id.history_menu_item -> {
+                    // Open History Fragment
+                    val historyFragment = HistoryFragment.newInstance()
+                    requireActivity().supportFragmentManager.beginTransaction()
+                        .add(R.id.main, historyFragment)
+                        .addToBackStack(null)
+                        .commit()
+                }
+            }
+            true
         }
     }
 

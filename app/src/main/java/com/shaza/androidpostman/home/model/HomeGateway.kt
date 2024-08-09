@@ -12,4 +12,6 @@ interface HomeGateway {
         headers: Map<String, String>,
         body: String? = null
     ): NetworkResponse
+
+    fun addToDB(networkResponse: NetworkResponse)
 }

@@ -16,4 +16,9 @@
 
     <string name="response_info">Response Info</string>
     <string name="request_result">Request Result</string>
+    <string name="request_history">Request History</string>
+    <string name="all">All</string>
+    <string name="success">Success</string>
+    <string name="failed">Failed</string>
+    <string name="sort_by_execution_time">Sort by execution time</string>
 </resources>

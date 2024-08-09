@@ -5,9 +5,11 @@ package com.shaza.androidpostman.shared.database
  */
 
 object DBQueryBuilder {
-    private val BASE_QUERY = "SELECT * FROM ${RequestInfoTableSchema.TABLE_NAME}"
+    private const val BASE_QUERY = "SELECT * FROM ${RequestInfoTableSchema.TABLE_NAME}"
 
     fun buildQuery(whereClauses: List<WhereClauses>, orderClauses: OrderClauses?): String {
+        val whereClauses = whereClauses.toMutableList()
+        whereClauses.removeAll(listOf(WhereClauses.GetAllRequest))
         val whereString = if (whereClauses.isNotEmpty()) {
             " WHERE ${whereClauses.joinToString(" AND ") { it.clauses }}"
         } else {

@@ -54,7 +54,7 @@ class DBQueryBuilderTest {
     @Test
     fun `buildQuery should include order clauses when provided`() {
         // Arrange
-        val whereClauses = emptyList<WhereClauses>()
+        val whereClauses = listOf(WhereClauses.GetAllRequest)
         val orderClauses = OrderClauses.OrderByTime
 
         // Act

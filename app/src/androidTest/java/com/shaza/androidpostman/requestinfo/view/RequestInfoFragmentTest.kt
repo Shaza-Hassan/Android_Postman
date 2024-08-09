@@ -15,7 +15,6 @@ import com.shaza.androidpostman.home.model.RequestType
 import com.shaza.androidpostman.requestInfo.view.RequestInfoFragment
 import com.shaza.androidpostman.requestInfo.viewmodel.RequestInfoViewModel
 import com.shaza.androidpostman.shared.model.NetworkResponse
-import com.shaza.androidpostman.shared.model.NetworkResponseInterface
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -29,7 +28,7 @@ import org.mockito.Mockito.`when`
 
 @RunWith(AndroidJUnit4::class)
 
-class RequestInfoTest {
+class RequestInfoFragmentTest {
 
     private lateinit var fragmentScenario: FragmentScenario<RequestInfoFragment>
 
@@ -77,8 +76,4 @@ class RequestInfoTest {
         onView(withId(R.id.request_type)).check(matches(isDisplayed()))
     }
 
-    @Test
-    fun testOnWriteUrlInEditText() {
-
-    }
 }
