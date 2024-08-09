@@ -11,4 +11,9 @@
     <string name="select_File_to_upload">Select File to Upload</string>
     <string name="remove_image">Remove Image</string>
     <string name="history">History</string>
+
+    <string name="request_info">Request Info</string>
+
+    <string name="response_info">Response Info</string>
+    <string name="request_result">Request Result</string>
 </resources>

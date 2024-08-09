@@ -10,6 +10,7 @@ import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.widget.doOnTextChanged
+import androidx.lifecycle.ViewModelProvider
 import com.shaza.androidpostman.R
 import com.shaza.androidpostman.databinding.FragmentHomeBinding
 import com.shaza.androidpostman.home.model.HomeRepository
@@ -17,6 +18,8 @@ import com.shaza.androidpostman.home.model.RequestType
 import com.shaza.androidpostman.home.view.adapter.AddHeadersAdapter
 import com.shaza.androidpostman.home.view.adapter.RemoveHeader
 import com.shaza.androidpostman.home.viewmodel.HomeViewModel
+import com.shaza.androidpostman.home.viewmodel.HomeViewModelInterface
+import com.shaza.androidpostman.requestInfo.view.RequestInfoFragment
 import com.shaza.androidpostman.shared.GenericViewModelFactory
 import com.shaza.androidpostman.shared.model.ResourceStatus
 import com.shaza.androidpostman.shared.netowrk.APIClient
@@ -31,11 +34,7 @@ class HomeFragment : Fragment() {
     private val  apiClient = APIClient()
     private val homeRepository = HomeRepository(apiClient)
 
-    private val viewModel: HomeViewModel by viewModels{
-        GenericViewModelFactory(HomeViewModel::class.java) {
-            HomeViewModel(homeRepository)
-        }
-    }
+    lateinit var viewModel: HomeViewModelInterface
     private lateinit var binding: FragmentHomeBinding
     private lateinit var adapter: AddHeadersAdapter
 
@@ -53,7 +52,10 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        val viewModelFactory = GenericViewModelFactory(HomeViewModel::class.java) {
+            HomeViewModel(homeRepository)
+        }
+        viewModel = ViewModelProvider(this, viewModelFactory)[HomeViewModel::class.java]
         initRecyclerView()
         initListener()
         initObservers()
@@ -106,7 +108,16 @@ class HomeFragment : Fragment() {
                 }
                 ResourceStatus.Success -> {
                     binding.progressBar.visibility = GONE
-                    Toast.makeText(requireContext(), resource.data?.response ?: "", Toast.LENGTH_SHORT).show()
+                    resource.data?.let {
+                        // Open Request Info Fragment
+                         val requestInfoFragment = RequestInfoFragment.newInstance(it)
+                            requireActivity().supportFragmentManager.beginTransaction()
+                                .add(R.id.main, requestInfoFragment)
+                                .addToBackStack(null)
+                                .commit()
+                    } ?: run {
+                        Toast.makeText(requireContext(), "No Data Found", Toast.LENGTH_SHORT).show()
+                    }
                 }
 
             }
@@ -114,18 +125,16 @@ class HomeFragment : Fragment() {
     }
 
     private fun onToggleButtonChange(){
-        binding.httpRequestType.httpTypeToggle.addOnButtonCheckedListener { group, checkedId, isChecked ->
-            if (isChecked) {
-                when (checkedId) {
-                    R.id.get_button -> {
-                        viewModel.setRequestType(RequestType.GET)
-                        showHideBodyRequest(isShow = false)
-                    }
+        binding.httpRequestType.httpTypeRadioGroup.setOnCheckedChangeListener { group, checkedId ->
+            when (checkedId) {
+                R.id.get_button -> {
+                    viewModel.setRequestType(RequestType.GET)
+                    showHideBodyRequest(isShow = false)
+                }
 
-                    R.id.post_button -> {
-                        viewModel.setRequestType(RequestType.POST)
-                        showHideBodyRequest(isShow = true)
-                    }
+                R.id.post_button -> {
+                    viewModel.setRequestType(RequestType.POST)
+                    showHideBodyRequest(isShow = true)
                 }
             }
         }

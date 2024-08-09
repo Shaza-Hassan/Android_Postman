@@ -33,6 +33,7 @@ xmlns:android="http://schemas.android.com/apk/res/android"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <androidx.core.widget.NestedScrollView
+            android:id="@+id/nested_scroll_view"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:paddingTop="8dp"
@@ -153,7 +154,6 @@ xmlns:android="http://schemas.android.com/apk/res/android"
             app:layout_constraintBottom_toBottomOf="parent"
             android:layout_marginHorizontal="16dp"
             android:layout_marginVertical="8dp"
-            style="?attr/materialButtonOutlinedStyle"
             android:text="@string/create_request"
             android:textAllCaps="false"/>
 

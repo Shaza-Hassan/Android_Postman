@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    id("kotlin-parcelize")
 }
 
 android {
@@ -70,5 +71,14 @@ dependencies {
     androidTestImplementation(libs.androidx.core.testing)
     androidTestImplementation(libs.androidx.junit.ktx)
     androidTestImplementation(libs.androidx.fragment.testing)
+    androidTestImplementation(libs.androidx.uiautomator)
+    androidTestImplementation(libs.mockito.android)
+    debugImplementation(libs.androidx.junit)
+    debugImplementation(libs.androidx.espresso.core)
+    debugImplementation(libs.androidx.core.testing)
+    debugImplementation(libs.androidx.junit.ktx)
+    debugImplementation(libs.androidx.fragment.testing)
+    debugImplementation(libs.androidx.uiautomator)
+    debugImplementation(libs.mockito.android)
 
 }

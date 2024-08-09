@@ -1,4 +1,4 @@
-package com.shaza.androidpostman.viewactionutils
+package com.shaza.androidpostman.utils
 
 import android.content.Context
 import android.view.View

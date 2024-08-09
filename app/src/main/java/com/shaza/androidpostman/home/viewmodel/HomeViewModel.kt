@@ -1,5 +1,6 @@
 package com.shaza.androidpostman.home.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -11,55 +12,54 @@ import com.shaza.androidpostman.shared.model.Resource
 
 class HomeViewModel(
     private val homeGateway: HomeGateway
-) : ViewModel() {
+) : HomeViewModelInterface, ViewModel() {
 
     private val _url = MutableLiveData<String>()
-    val url: LiveData<String> = _url
+    override val url: LiveData<String> = _url
 
     private val _requestType = MutableLiveData<RequestType>()
-    val requestType: LiveData<RequestType> = _requestType
+    override val requestType: LiveData<RequestType> = _requestType
 
     private val _headers = MutableLiveData<MutableList<Header>>()
-    val headers: LiveData<MutableList<Header>> = _headers
+    override val headers: LiveData<MutableList<Header>> = _headers
 
     private val _body = MutableLiveData<String>()
-    val body: LiveData<String> = _body
+    override val body: LiveData<String> = _body
 
     private val _response = MutableLiveData<Resource<NetworkResponse>>()
-    val response: LiveData<Resource<NetworkResponse>> = _response
+    override val response: LiveData<Resource<NetworkResponse>> = _response
 
     init {
         _response.value = Resource.idle()
         _headers.value = mutableListOf()
     }
 
-    fun setUrl(url: String) {
+    override fun setUrl(url: String) {
         _url.value = url
     }
 
-
-    fun setRequestType(type: RequestType) {
+    override fun setRequestType(type: RequestType) {
         _requestType.value = type
     }
 
-    fun addHeader() {
+    override fun addHeader() {
         val header = Header("", "")
         _headers.value?.add(header)
     }
 
-    fun removeHeader(index: Int) {
+    override fun removeHeader(index: Int) {
         _headers.value?.removeAt(index)
     }
 
-    fun getHeaders(): List<Header> {
+    override fun getHeaders(): List<Header> {
         return _headers.value ?: emptyList()
     }
 
-    fun setBody(body: String) {
+    override fun setBody(body: String) {
         _body.value = body
     }
 
-    fun sendRequest() {
+    override fun sendRequest() {
         // Ensure that you're using the latest state values
         val url = _url.value ?: ""
         val requestType = _requestType.value ?: RequestType.GET
@@ -77,6 +77,7 @@ class HomeViewModel(
         Thread {
             _response.postValue(Resource.loading())
             val networkResponse = homeGateway.makeRequest(url, requestType, requestHeaders, body)
+            Log.v("HomeViewModel", "Response: $networkResponse")
             _response.postValue(Resource.success(networkResponse))
         }.start()
     }
