@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:layout_constraintTop_toTopOf="parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    app:layout_constraintTop_toTopOf="parent">
 
     <!--            Status code-->
     <TextView
         android:id="@+id/request_status_code"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        tools:text= "Status code: 200"/>
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Status code: 200" />
 
     <!--            Request Time-->
     <TextView
@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="@id/request_type"
         app:layout_constraintStart_toStartOf="parent"
-        tools:text= "Time: 200ms"/>
+        tools:text="Time: 200ms" />
     <!--            Request type-->
     <TextView
         android:id="@+id/request_type"

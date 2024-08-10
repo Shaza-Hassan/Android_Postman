@@ -11,8 +11,10 @@ import java.net.HttpURLConnection
  * Created by Shaza Hassan on 2024/Aug/07.
  */
 object ResponseHandler {
-    fun handleResponse( headers: Map<String, String>,requestBody: String?,
-                               connection: HttpURLConnection): NetworkResponse {
+    fun handleResponse(
+        headers: Map<String, String>, requestBody: String?,
+        connection: HttpURLConnection
+    ): NetworkResponse {
         val networkResponse = NetworkResponse(
             url = connection.url.toString(),
             requestType = RequestType.valueOf(connection.requestMethod),

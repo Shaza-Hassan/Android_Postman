@@ -34,7 +34,7 @@ class RequestInfoFragmentTest {
 
     private lateinit var mockViewModel: RequestInfoViewModel
 
-    private lateinit var mockNetworkResponse : NetworkResponse
+    private lateinit var mockNetworkResponse: NetworkResponse
 
     @Before
     fun setUp() {
@@ -69,7 +69,8 @@ class RequestInfoFragmentTest {
             fragmentArgs = Bundle().apply {
                 putParcelable("networkResponse", mockNetworkResponse)
             },
-            themeResId = R.style.Theme_AndroidPostman)
+            themeResId = R.style.Theme_AndroidPostman
+        )
 
         Thread.sleep(1000)
 
@@ -81,7 +82,7 @@ class RequestInfoFragmentTest {
     }
 
     @Test
-    fun makeSureTheDataIsShowing(){
+    fun makeSureTheDataIsShowing() {
 
         val liveData = MutableLiveData<NetworkResponse>()
         val idlingResource = DataIdlingResource(liveData)

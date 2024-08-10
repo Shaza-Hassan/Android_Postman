@@ -58,7 +58,7 @@ class RequestHistoryAdapter(
                     }
                 }
 
-                setSpannableText(networkResponse.url ?: "", "URL: ", binding.requestUrl)
+                setSpannableText(networkResponse.url ?: "", "URL: ", binding.requestUrlHistory)
 
                 setSpannableText("${networkResponse.elapsedTime} ms", "Time: ", binding.requestTime)
 
@@ -74,6 +74,7 @@ class RequestHistoryAdapter(
             }
 
         }
+
         private fun setSpannableText(normalText: String, boldText: String, textView: TextView) {
             val s = SpannableStringBuilder()
                 .bold { append(boldText) }

@@ -31,12 +31,23 @@ class HistoryRepositoryTest {
 
     @Test
     fun `test list all request without any filters or order id`() {
-        val whereClauses = listOf<WhereClauses>() // Provide specific WhereClauses instances as needed
+        val whereClauses =
+            listOf<WhereClauses>()
         val orderClauses = OrderClauses.OrderById
 
         val expectedResponse = listOf(
-            NetworkResponse(url = "http://example.com", requestType = RequestType.GET, requestHeaders = emptyMap(), body = "{}"),
-            NetworkResponse(url = "http://example.com", requestType = RequestType.GET, requestHeaders = emptyMap(), body = "{}"),
+            NetworkResponse(
+                url = "http://example.com",
+                requestType = RequestType.GET,
+                requestHeaders = emptyMap(),
+                body = "{}"
+            ),
+            NetworkResponse(
+                url = "http://example.com",
+                requestType = RequestType.GET,
+                requestHeaders = emptyMap(),
+                body = "{}"
+            ),
         )
 
         every { mockSelectFromDB.getAllRequests(listOf(), orderClauses) } returns expectedResponse

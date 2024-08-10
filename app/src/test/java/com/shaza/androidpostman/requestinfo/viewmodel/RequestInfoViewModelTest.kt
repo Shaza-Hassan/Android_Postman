@@ -6,7 +6,6 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import com.shaza.androidpostman.requestInfo.viewmodel.RequestInfoViewModel
 import com.shaza.androidpostman.shared.model.NetworkResponse
-import com.shaza.androidpostman.shared.model.Resource
 import com.shaza.androidpostman.shared.utils.SdkVersionProvider
 import io.mockk.every
 import io.mockk.mockk
@@ -40,9 +39,14 @@ class RequestInfoViewModelTest {
         viewModel = RequestInfoViewModel(sdkVersionProvider)
 
         mockNetworkResponse = mockk()
-        every { mockBundle.getParcelable("networkResponse", NetworkResponse::class.java) }returns mockNetworkResponse
+        every {
+            mockBundle.getParcelable(
+                "networkResponse",
+                NetworkResponse::class.java
+            )
+        } returns mockNetworkResponse
 
-        every { mockBundle.getParcelable<NetworkResponse>("networkResponse") }returns mockNetworkResponse
+        every { mockBundle.getParcelable<NetworkResponse>("networkResponse") } returns mockNetworkResponse
 
         viewModel.networkResponse.observeForever(observer)
 

@@ -1,7 +1,5 @@
 package com.shaza.androidpostman.shared.extensions
 
-import android.util.Log
-
 /**
  * Created by Shaza Hassan on 2024/Aug/09.
  */

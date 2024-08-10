@@ -1,12 +1,11 @@
 package com.shaza.androidpostman.history.view
 
-import androidx.fragment.app.viewModels
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.shaza.androidpostman.R
 import com.shaza.androidpostman.databinding.FragmentHistoryBinding
@@ -15,7 +14,6 @@ import com.shaza.androidpostman.history.model.HistoryRepository
 import com.shaza.androidpostman.history.view.adapter.HistoryItemListener
 import com.shaza.androidpostman.history.view.adapter.RequestHistoryAdapter
 import com.shaza.androidpostman.history.viewmodel.HistoryViewModel
-import com.shaza.androidpostman.home.viewmodel.HomeViewModel
 import com.shaza.androidpostman.requestInfo.view.RequestInfoFragment
 import com.shaza.androidpostman.shared.GenericViewModelFactory
 import com.shaza.androidpostman.shared.database.NetworkRequestDBHelper
@@ -36,10 +34,6 @@ class HistoryFragment : Fragment() {
     private lateinit var binding: FragmentHistoryBinding
     private lateinit var adapter: RequestHistoryAdapter
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -50,7 +44,8 @@ class HistoryFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        historyGateway = HistoryRepository(SelectFromDB(NetworkRequestDBHelper.getInstance(requireContext())))
+        historyGateway =
+            HistoryRepository(SelectFromDB(NetworkRequestDBHelper.getInstance(requireContext())))
         val viewModelFactory = GenericViewModelFactory(HistoryViewModel::class.java) {
             HistoryViewModel(historyGateway)
         }
@@ -62,10 +57,9 @@ class HistoryFragment : Fragment() {
     }
 
     private fun initObservers() {
-        viewModel.requests.observe(viewLifecycleOwner) {
-            requestResource ->
+        viewModel.requests.observe(viewLifecycleOwner) { requestResource ->
             when (requestResource.status) {
-                is  ResourceStatus.Success -> {
+                is ResourceStatus.Success -> {
                     binding.historyProgressBar.visibility = View.GONE
                     requestResource.data?.let {
                         adapter.setList(it)
@@ -74,7 +68,11 @@ class HistoryFragment : Fragment() {
 
                 is ResourceStatus.Error -> {
                     binding.historyProgressBar.visibility = View.GONE
-                    Toast.makeText(requireContext(), requestResource.error?.message, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        requireContext(),
+                        requestResource.error?.message,
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
 
                 is ResourceStatus.Idle -> {
@@ -96,21 +94,23 @@ class HistoryFragment : Fragment() {
         onNavigationButtonClicked()
     }
 
-    private fun onNavigationButtonClicked(){
+    private fun onNavigationButtonClicked() {
         binding.historyToolbar.setNavigationOnClickListener {
             requireActivity().supportFragmentManager.popBackStack()
         }
     }
 
-    private fun onRequestTypeRadioButtonsClicked(){
+    private fun onRequestTypeRadioButtonsClicked() {
         binding.httpTypeToggle.setOnCheckedChangeListener { _, checkedId ->
-            when(checkedId){
+            when (checkedId) {
                 R.id.all_request_type -> {
                     viewModel.updateRequestType(WhereClauses.GetAllRequest)
                 }
+
                 R.id.get_type -> {
                     viewModel.updateRequestType(WhereClauses.GetAllGETRequest)
                 }
+
                 R.id.post_type -> {
                     viewModel.updateRequestType(WhereClauses.GetAllPOSTRequest)
                 }
@@ -118,15 +118,17 @@ class HistoryFragment : Fragment() {
         }
     }
 
-    private fun onRequestStatusTypeRadioButtonsClicked(){
+    private fun onRequestStatusTypeRadioButtonsClicked() {
         binding.httpStatusToggle.setOnCheckedChangeListener { _, checkedId ->
-            when(checkedId){
+            when (checkedId) {
                 R.id.all_request -> {
                     viewModel.updateRequestStatus(WhereClauses.GetAllRequest)
                 }
+
                 R.id.success_requests -> {
                     viewModel.updateRequestStatus(WhereClauses.GetAllSuccessRequest)
                 }
+
                 R.id.failed_requests -> {
                     viewModel.updateRequestStatus(WhereClauses.GetAllFailedRequest)
                 }
@@ -134,9 +136,9 @@ class HistoryFragment : Fragment() {
         }
     }
 
-    private fun sortByTimeCheckBox(){
+    private fun sortByTimeCheckBox() {
         binding.sortByTime.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked){
+            if (isChecked) {
                 viewModel.setOrderClauses(OrderClauses.OrderByTime)
             } else {
                 viewModel.setOrderClauses(OrderClauses.OrderById)

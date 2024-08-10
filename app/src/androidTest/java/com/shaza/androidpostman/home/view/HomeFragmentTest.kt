@@ -41,7 +41,7 @@ import org.junit.runner.RunWith
 class HomeFragmentTest {
 
     @get:Rule
-    val activityRule = ActivityScenarioRule(MainActivity::class.java) // Replace with your activity that contains HomeFragment
+    val activityRule = ActivityScenarioRule(MainActivity::class.java)
 
     @Before
     fun setUp() {
@@ -54,7 +54,7 @@ class HomeFragmentTest {
     }
 
     @Test
-    fun testOnHistoryButtonClicked(){
+    fun testOnHistoryButtonClicked() {
         onView(withId(R.id.history_menu_item)).perform(click())
         onView(withId(R.id.history_fragment)).check(matches(isDisplayed()))
         pressBack()
@@ -93,7 +93,7 @@ class HomeFragmentTest {
     }
 
     @Test
-    fun testAddMultipleHeadersAndWriteInFirstItem(){
+    fun testAddMultipleHeadersAndWriteInFirstItem() {
         onView(withId(R.id.add_new_header))
             .perform(click())
             .perform(click())
@@ -103,13 +103,16 @@ class HomeFragmentTest {
             .perform(
                 actionOnItemAtPosition<RecyclerView.ViewHolder>(
                     0, // First item in the list
-                    typeTextInChildViewWithId(R.id.header_title_edit_text, "Header 1 Text") // Replace with your actual EditText ID within the item layout
+                    typeTextInChildViewWithId(
+                        R.id.header_title_edit_text,
+                        "Header 1 Text"
+                    ) // Replace with your actual EditText ID within the item layout
                 )
             )
     }
 
     @Test
-    fun fillScreenWithDataForGetRequest(){
+    fun fillScreenWithDataForGetRequest() {
         onView(withId(R.id.url_edit_text)).perform(typeText("https://dummyjson.com/posts/1"))
         onView(withId(R.id.add_new_header)).perform(click())
 
@@ -130,14 +133,14 @@ class HomeFragmentTest {
     }
 
     @Test
-    fun fillScreenWithDataForGetWithoutHeaderRequest(){
+    fun fillScreenWithDataForGetWithoutHeaderRequest() {
         onView(withId(R.id.url_edit_text)).perform(typeText("https://dummyjson.com/posts/1"))
         onView(withId(R.id.send_request)).perform(click())
         onView(withId(R.id.progress_bar)).check(matches(isDisplayed()))
     }
 
     @Test
-    fun fillScreenWithDataForPostRequestWithoutHeader(){
+    fun fillScreenWithDataForPostRequestWithoutHeader() {
         onView(withId(R.id.post_button)).perform(click())
         onView(withId(R.id.url_edit_text)).perform(typeText("https://dummyjson.com/posts/add"))
         onView(withId(R.id.body_edit_text)).perform(typeText("{'title':'foo','body':'bar','userId':1}"))
@@ -145,7 +148,7 @@ class HomeFragmentTest {
     }
 
     @Test
-    fun fillScreenWithDataForPostRequestWithHeader(){
+    fun fillScreenWithDataForPostRequestWithHeader() {
         onView(withId(R.id.post_button)).perform(click())
         onView(withId(R.id.url_edit_text)).perform(typeText("https://dummyjson.com/posts/add"))
         onView(withId(R.id.add_new_header)).perform(click())
@@ -164,47 +167,61 @@ class HomeFragmentTest {
             )
         )
 
-        onView(withId(R.id.body_edit_text)).perform(scrollTo(),typeText("{'title':'foo','body':'bar','userId':1}"))
+        onView(withId(R.id.body_edit_text)).perform(
+            scrollTo(),
+            typeText("{'title':'foo','body':'bar','userId':1}")
+        )
         onView(withId(R.id.send_request)).perform(click(), closeSoftKeyboard())
         onView(withId(R.id.progress_bar)).check(matches(isDisplayed()))
 
     }
 
     @Test
-    fun handlePostRequestWithSelectFile(){
+    fun handlePostRequestWithSelectFile() {
         onView(withId(R.id.post_button)).perform(click())
-        onView(withId(R.id.url_edit_text)).perform(typeText("https://dummyjson.com/posts/add"), closeSoftKeyboard())
+        onView(withId(R.id.url_edit_text)).perform(
+            typeText("https://dummyjson.com/posts/add"),
+            closeSoftKeyboard()
+        )
         val mockFileUri = Uri.parse("content://path/to/mock/file.text")
         val resultData = Intent().apply {
             data = mockFileUri
         }
         val result = Instrumentation.ActivityResult(Activity.RESULT_OK, resultData)
 
-        Intents.intending(allOf(
-            hasAction(Intent.ACTION_GET_CONTENT),
-            hasType("*/*")
-        )).respondWith(result)
+        Intents.intending(
+            allOf(
+                hasAction(Intent.ACTION_GET_CONTENT),
+                hasType("*/*")
+            )
+        ).respondWith(result)
 
         onView(withId(R.id.file_to_upload)).perform(scrollTo(), click())
     }
 
     @Test
-    fun handlePostRequestWithSelectFileAndRemoveIt(){
+    fun handlePostRequestWithSelectFileAndRemoveIt() {
         onView(withId(R.id.post_button)).perform(scrollTo(), click())
-        onView(withId(R.id.url_edit_text)).perform(scrollTo(), typeText("https://dummyjson.com/posts/add"), closeSoftKeyboard())
+        onView(withId(R.id.url_edit_text)).perform(
+            scrollTo(),
+            typeText("https://dummyjson.com/posts/add"),
+            closeSoftKeyboard()
+        )
         val mockFileUri = Uri.parse("content://path/to/mock/file.text")
         val resultData = Intent().apply {
             data = mockFileUri
         }
         val result = Instrumentation.ActivityResult(Activity.RESULT_OK, resultData)
 
-        Intents.intending(allOf(
-            hasAction(Intent.ACTION_GET_CONTENT),
-            hasType("*/*")
-        )).respondWith(result)
+        Intents.intending(
+            allOf(
+                hasAction(Intent.ACTION_GET_CONTENT),
+                hasType("*/*")
+            )
+        ).respondWith(result)
 
         onView(withId(R.id.file_to_upload)).perform(scrollTo(), click())
-        onView(withId(R.id.remove_file)).perform(scrollTo(),click())
+        onView(withId(R.id.remove_file)).perform(scrollTo(), click())
         onView(withId(R.id.selected_file_layout)).check(matches(not(isDisplayed())))
     }
 }

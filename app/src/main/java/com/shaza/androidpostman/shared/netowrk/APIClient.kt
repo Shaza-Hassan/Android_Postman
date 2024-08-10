@@ -28,12 +28,18 @@ class APIClient : HTTPClient {
                 RequestHandler.appendBodyIfPost(requestType, body, connection)
             }
             uri?.let {
-                RequestHandler.uploadFile(requestType, uri, connection,contentResolver)
+                RequestHandler.uploadFile(requestType, uri, connection, contentResolver)
             }
-            response = ResponseHandler.handleResponse(headers,body,connection)
+            response = ResponseHandler.handleResponse(headers, body, connection)
             response.queryParameters = UrlUtils.extractQueryParams(url)
         } catch (e: Exception) {
-            response = NetworkResponse(url, requestType, requestHeaders = headers, body = body,error = e.message)
+            response = NetworkResponse(
+                url,
+                requestType,
+                requestHeaders = headers,
+                body = body,
+                error = e.message
+            )
             response.queryParameters = UrlUtils.extractQueryParams(url)
         } finally {
             val elapsedTime = System.currentTimeMillis() - startTime
@@ -41,7 +47,13 @@ class APIClient : HTTPClient {
                 it.elapsedTime = elapsedTime
                 return it
             } ?: run {
-                val networkResponse = NetworkResponse(url, requestType, requestHeaders = headers, body = body,elapsedTime = elapsedTime)
+                val networkResponse = NetworkResponse(
+                    url,
+                    requestType,
+                    requestHeaders = headers,
+                    body = body,
+                    elapsedTime = elapsedTime
+                )
                 return networkResponse
             }
         }

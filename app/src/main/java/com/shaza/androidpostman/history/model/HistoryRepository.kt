@@ -9,8 +9,11 @@ import com.shaza.androidpostman.shared.model.NetworkResponse
 /**
  * Created by Shaza Hassan on 2024/Aug/09.
  */
-class HistoryRepository(private val selectFromDB: SelectFromDB): HistoryGateway {
-    override fun getHistory(whereClause: List<WhereClauses>, sortedBy: OrderClauses): List<NetworkResponse> {
+class HistoryRepository(private val selectFromDB: SelectFromDB) : HistoryGateway {
+    override fun getHistory(
+        whereClause: List<WhereClauses>,
+        sortedBy: OrderClauses
+    ): List<NetworkResponse> {
         Log.v("HistoryRepository", "whereClause: $whereClause, sortedBy: $sortedBy")
         return selectFromDB.getAllRequests(whereClause, sortedBy)
     }

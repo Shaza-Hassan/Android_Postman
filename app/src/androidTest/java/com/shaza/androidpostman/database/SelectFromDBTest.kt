@@ -3,12 +3,10 @@ package com.shaza.androidpostman.database
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry
 import com.shaza.androidpostman.home.model.RequestType
 import com.shaza.androidpostman.shared.database.NetworkRequestDBHelper
 import com.shaza.androidpostman.shared.database.OrderClauses
 import com.shaza.androidpostman.shared.database.RequestInfoTableSchema
-import com.shaza.androidpostman.shared.database.RequestMapper
 import com.shaza.androidpostman.shared.database.SelectFromDB
 import com.shaza.androidpostman.shared.model.NetworkResponse
 import io.mockk.every
@@ -101,7 +99,8 @@ class SelectFromDBTest {
         )
 
         // Insert data into the database
-        val query = "SELECT * FROM ${RequestInfoTableSchema.TABLE_NAME} ORDER BY ${OrderClauses.OrderById}"
+        val query =
+            "SELECT * FROM ${RequestInfoTableSchema.TABLE_NAME} ORDER BY ${OrderClauses.OrderById}"
         every { db.rawQuery(query, null) } returns cursor
 
         // Act

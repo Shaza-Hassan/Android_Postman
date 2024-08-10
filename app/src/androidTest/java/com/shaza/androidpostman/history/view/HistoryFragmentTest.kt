@@ -28,23 +28,23 @@ class HistoryFragmentTest {
 
     @Before
     fun setUp() {
-        fragmentScenario = launchFragmentInContainer<HistoryFragment>(themeResId = R.style.Theme_AndroidPostman) {
-            HistoryFragment().apply {
-                // Override the ViewModelFactory to inject the mock ViewModel
-                viewModel = mockViewModel
+        fragmentScenario =
+            launchFragmentInContainer<HistoryFragment>(themeResId = R.style.Theme_AndroidPostman) {
+                HistoryFragment().apply {
+                    viewModel = mockViewModel
+                }
             }
-        }
 
         Thread.sleep(1000)
     }
 
     @Test
-    fun testHistoryFragmentIsDisplayed(){
+    fun testHistoryFragmentIsDisplayed() {
         onView(withId(R.id.history_fragment)).check(matches(isDisplayed()))
     }
 
     @Test
-    fun testUpdateRequestTypeSelector(){
+    fun testUpdateRequestTypeSelector() {
         onView(withId(R.id.get_type)).perform(click())
         onView(withId(R.id.get_type)).check(matches(isChecked()))
 
@@ -60,7 +60,7 @@ class HistoryFragmentTest {
     }
 
     @Test
-    fun testUpdateRequestStatusSelector(){
+    fun testUpdateRequestStatusSelector() {
         onView(withId(R.id.success_requests)).perform(click())
         onView(withId(R.id.success_requests)).check(matches(isChecked()))
 

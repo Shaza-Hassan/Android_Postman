@@ -38,6 +38,7 @@ class HomeViewModelTest {
     private val observer = mockk<Observer<Resource<NetworkResponse>>>(relaxed = true)
     private lateinit var contentResolver: ContentResolver
     private lateinit var uri: Uri
+
     @Before
     fun setUp() {
         mockHomeGateway = mockk()
@@ -103,7 +104,7 @@ class HomeViewModelTest {
                 url,
                 requestType,
                 headers.associate { it.title!! to it.value!! },
-                body,null, contentResolver
+                body, null, contentResolver
             )
         } returns networkResponse
         every { mockHomeGateway.addToDB(networkResponse) } just Runs
@@ -129,7 +130,7 @@ class HomeViewModelTest {
                 url,
                 requestType,
                 headers.associate { it.title!! to it.value!! },
-                body,null, contentResolver
+                body, null, contentResolver
             )
         }
         verify { observer.onChanged(Resource.loading()) }
@@ -165,7 +166,8 @@ class HomeViewModelTest {
         val actual = viewModel.response.value
 
         verify { mockHomeGateway.isConnected() }
-        val expectedResource : Resource<NetworkResponse> = Resource.error(Exception("No internet connection"))
+        val expectedResource: Resource<NetworkResponse> =
+            Resource.error(Exception("No internet connection"))
 
         assertEquals(
             expectedResource.status,
@@ -245,7 +247,7 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `test send body when making calling api`(){
+    fun `test send body when making calling api`() {
         // Arrange
         val url = "http://example.com"
         val requestType = RequestType.POST
@@ -303,7 +305,7 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `test set headers when calling api`(){
+    fun `test set headers when calling api`() {
         // Arrange
         val url = "http://example.com"
         val requestType = RequestType.POST

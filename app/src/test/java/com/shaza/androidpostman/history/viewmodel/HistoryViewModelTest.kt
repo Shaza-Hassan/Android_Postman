@@ -42,9 +42,19 @@ class HistoryViewModelTest {
     fun `test getAllRequests updates LiveData with success`() {
         // Arrange
         val expectedResponses = listOf(
-            NetworkResponse(url = "http://example.com", requestType = RequestType.GET, requestHeaders = emptyMap(), body = "{}")
+            NetworkResponse(
+                url = "http://example.com",
+                requestType = RequestType.GET,
+                requestHeaders = emptyMap(),
+                body = "{}"
+            )
         )
-        every { historyGateway.getHistory(any(), eq(OrderClauses.OrderById)) } returns expectedResponses
+        every {
+            historyGateway.getHistory(
+                any(),
+                eq(OrderClauses.OrderById)
+            )
+        } returns expectedResponses
         historyViewModel.getAllRequests()
 
         val latch = CountDownLatch(1) // Waiting for success callback
@@ -79,7 +89,7 @@ class HistoryViewModelTest {
     }
 
     @Test
-    fun `update where clause list with return only get requests`(){
+    fun `update where clause list with return only get requests`() {
         // Arrange
         val whereClauses = WhereClauses.GetAllGETRequest
         val expectedWhereClauses = listOf(WhereClauses.GetAllGETRequest)
@@ -91,7 +101,7 @@ class HistoryViewModelTest {
     }
 
     @Test
-    fun `update where clause list with return only post requests`(){
+    fun `update where clause list with return only post requests`() {
         // Arrange
         val whereClauses = WhereClauses.GetAllPOSTRequest
         val expectedWhereClauses = listOf(WhereClauses.GetAllPOSTRequest)
@@ -103,7 +113,7 @@ class HistoryViewModelTest {
     }
 
     @Test
-    fun `update where clause list with return only success requests`(){
+    fun `update where clause list with return only success requests`() {
         // Arrange
         val whereClauses = WhereClauses.GetAllSuccessRequest
         val expectedWhereClauses = listOf(WhereClauses.GetAllSuccessRequest)
@@ -115,7 +125,7 @@ class HistoryViewModelTest {
     }
 
     @Test
-    fun `update where clause list with return only failed requests`(){
+    fun `update where clause list with return only failed requests`() {
         // Arrange
         val whereClauses = WhereClauses.GetAllFailedRequest
         val expectedWhereClauses = listOf(WhereClauses.GetAllFailedRequest)
@@ -127,9 +137,10 @@ class HistoryViewModelTest {
     }
 
     @Test
-    fun `where for all GET success requests`(){
+    fun `where for all GET success requests`() {
         // Arrange
-        val expectedWhereClauses = listOf(WhereClauses.GetAllSuccessRequest,WhereClauses.GetAllSuccessRequest)
+        val expectedWhereClauses =
+            listOf(WhereClauses.GetAllSuccessRequest, WhereClauses.GetAllSuccessRequest)
         // Act
         historyViewModel.updateRequestType(WhereClauses.GetAllGETRequest)
         historyViewModel.updateRequestStatus(WhereClauses.GetAllSuccessRequest)
@@ -139,9 +150,10 @@ class HistoryViewModelTest {
     }
 
     @Test
-    fun `where for all POST failed requests`(){
+    fun `where for all POST failed requests`() {
         // Arrange
-        val expectedWhereClauses = listOf(WhereClauses.GetAllFailedRequest,WhereClauses.GetAllFailedRequest)
+        val expectedWhereClauses =
+            listOf(WhereClauses.GetAllFailedRequest, WhereClauses.GetAllFailedRequest)
 
         // Act
         historyViewModel.updateRequestType(WhereClauses.GetAllPOSTRequest)
@@ -152,7 +164,7 @@ class HistoryViewModelTest {
     }
 
     @Test
-    fun `where for all requests`(){
+    fun `where for all requests`() {
         // Arrange
         val expectedWhereClauses = listOf(WhereClauses.GetAllRequest)
 
@@ -166,7 +178,7 @@ class HistoryViewModelTest {
     }
 
     @Test
-    fun `set order clause to order by id`(){
+    fun `set order clause to order by id`() {
         // Arrange
         val orderClauses = OrderClauses.OrderByTime
         val expectedOrderClauses = OrderClauses.OrderByTime
@@ -174,6 +186,6 @@ class HistoryViewModelTest {
         historyViewModel.setOrderClauses(orderClauses)
 
         // Assert
-        assertEquals(historyViewModel.getOrderClauses(),expectedOrderClauses)
+        assertEquals(historyViewModel.getOrderClauses(), expectedOrderClauses)
     }
 }

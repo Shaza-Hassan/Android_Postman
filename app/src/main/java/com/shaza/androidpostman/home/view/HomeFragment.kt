@@ -3,10 +3,8 @@ package com.shaza.androidpostman.home.view
 import android.Manifest
 import android.content.pm.PackageManager
 import android.net.Uri
-import androidx.fragment.app.viewModels
 import android.os.Bundle
 import android.provider.OpenableColumns
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
@@ -16,6 +14,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doOnTextChanged
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.shaza.androidpostman.R
 import com.shaza.androidpostman.databinding.FragmentHomeBinding
@@ -52,10 +51,6 @@ class HomeFragment : Fragment() {
     lateinit var viewModel: HomeViewModel
     private lateinit var binding: FragmentHomeBinding
     private lateinit var adapter: AddHeadersAdapter
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -239,7 +234,7 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun onRemoveFileButtonClicked(){
+    private fun onRemoveFileButtonClicked() {
         binding.removeFile.setOnClickListener {
             viewModel.setSelectedFileUri(null)
         }
@@ -259,14 +254,19 @@ class HomeFragment : Fragment() {
 
     private fun requestStoragePermission() {
         when {
-            ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED -> {
+            ContextCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            ) == PackageManager.PERMISSION_GRANTED -> {
                 openFilePicker()
             }
+
             shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE) -> {
                 // Explain why you need the permission, then request it
                 // E.g., show a dialog and then request the permission
                 requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
             }
+
             else -> {
                 // Directly request the permission
                 requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
@@ -278,21 +278,23 @@ class HomeFragment : Fragment() {
         getContentLauncher.launch("*/*") // Set MIME type (e.g., "image/*" for images)
     }
 
-    private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
-        if (isGranted) {
-            openFilePicker()
-        } else {
-            Toast.makeText(requireContext(), "Permission Denied", Toast.LENGTH_SHORT).show()
+    private val requestPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+            if (isGranted) {
+                openFilePicker()
+            } else {
+                Toast.makeText(requireContext(), "Permission Denied", Toast.LENGTH_SHORT).show()
+            }
         }
-    }
 
-    private val getContentLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-        uri?.let {
-            handleSelectedFile(it)
-        } ?: run {
-            binding.selectedFileLayout.visibility = GONE
+    private val getContentLauncher =
+        registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+            uri?.let {
+                handleSelectedFile(it)
+            } ?: run {
+                binding.selectedFileLayout.visibility = GONE
+            }
         }
-    }
 
     private fun handleSelectedFile(uri: Uri) {
         binding.selectedFileLayout.visibility = VISIBLE

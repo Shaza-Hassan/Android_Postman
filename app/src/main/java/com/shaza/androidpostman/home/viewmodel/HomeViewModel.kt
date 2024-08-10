@@ -1,18 +1,16 @@
 package com.shaza.androidpostman.home.viewmodel
 
 import android.content.ContentResolver
-import android.content.Context
 import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.shaza.androidpostman.home.model.Header
 import com.shaza.androidpostman.home.model.HomeGateway
 import com.shaza.androidpostman.home.model.RequestType
-import com.shaza.androidpostman.shared.database.AddRequestInDB
 import com.shaza.androidpostman.shared.model.NetworkResponse
 import com.shaza.androidpostman.shared.model.Resource
+import com.shaza.androidpostman.shared.utils.EspressoIdlingResource
 import java.util.concurrent.Executors
 
 class HomeViewModel(
@@ -97,11 +95,20 @@ class HomeViewModel(
             }
         }
 
+        EspressoIdlingResource.increment()
         Executors.newSingleThreadExecutor().execute {
             _response.postValue(Resource.loading())
-            val networkResponse = homeGateway.makeRequest(url, requestType, requestHeaders, body, _selectedFileUri.value, contentResolver)
-            homeGateway.addToDB(networkResponse)
+            val networkResponse = homeGateway.makeRequest(
+                url,
+                requestType,
+                requestHeaders,
+                body,
+                _selectedFileUri.value,
+                contentResolver
+            )
             _response.postValue(Resource.success(networkResponse))
+            homeGateway.addToDB(networkResponse)
+            EspressoIdlingResource.decrement()
         }
     }
 }

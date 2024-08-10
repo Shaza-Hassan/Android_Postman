@@ -33,7 +33,12 @@ object RequestHandler {
         }
     }
 
-    fun uploadFile(requestType: RequestType, uri: Uri?, connection: HttpURLConnection, contentResolver: ContentResolver) {
+    fun uploadFile(
+        requestType: RequestType,
+        uri: Uri?,
+        connection: HttpURLConnection,
+        contentResolver: ContentResolver
+    ) {
         if (requestType == RequestType.POST && uri != null) {
             val boundary = "Boundary-${System.currentTimeMillis()}"
             connection.doOutput = true

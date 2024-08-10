@@ -22,8 +22,14 @@ object RequestMapper {
             put(RequestInfoTableSchema.COLUMN_ERROR, httpResponse.error)
             put(RequestInfoTableSchema.COLUMN_QUERY_PARAMS, httpResponse.queryParameters.toString())
             put(RequestInfoTableSchema.COLUMN_BODY_REQUEST, httpResponse.body)
-            put(RequestInfoTableSchema.COLUMN_REQUEST_HEADERS, httpResponse.requestHeaders.toString())
-            put(RequestInfoTableSchema.COLUMN_RESPONSE_HEADERS, httpResponse.responseHeaders.toString())
+            put(
+                RequestInfoTableSchema.COLUMN_REQUEST_HEADERS,
+                httpResponse.requestHeaders.toString()
+            )
+            put(
+                RequestInfoTableSchema.COLUMN_RESPONSE_HEADERS,
+                httpResponse.responseHeaders.toString()
+            )
         }
     }
 
@@ -33,15 +39,24 @@ object RequestMapper {
         while (cursor.moveToNext()) {
             val httpResponse = NetworkResponse(
                 url = cursor.getString(cursor.getColumnIndex(RequestInfoTableSchema.COLUMN_URL)),
-                requestType = RequestType.valueOf(cursor.getString(cursor.getColumnIndex(RequestInfoTableSchema.COLUMN_REQUEST_TYPE))),
+                requestType = RequestType.valueOf(
+                    cursor.getString(
+                        cursor.getColumnIndex(
+                            RequestInfoTableSchema.COLUMN_REQUEST_TYPE
+                        )
+                    )
+                ),
                 responseCode = cursor.getInt(cursor.getColumnIndex(RequestInfoTableSchema.COLUMN_STATUS_CODE)),
                 elapsedTime = cursor.getLong(cursor.getColumnIndex(RequestInfoTableSchema.COLUMN_TIME)),
                 response = cursor.getString(cursor.getColumnIndex(RequestInfoTableSchema.COLUMN_RESPONSE)),
                 error = cursor.getString(cursor.getColumnIndex(RequestInfoTableSchema.COLUMN_ERROR)),
-                queryParameters = cursor.getString(cursor.getColumnIndex(RequestInfoTableSchema.COLUMN_QUERY_PARAMS)).toMap(),
+                queryParameters = cursor.getString(cursor.getColumnIndex(RequestInfoTableSchema.COLUMN_QUERY_PARAMS))
+                    .toMap(),
                 body = cursor.getString(cursor.getColumnIndex(RequestInfoTableSchema.COLUMN_BODY_REQUEST)),
-                requestHeaders = cursor.getString(cursor.getColumnIndex(RequestInfoTableSchema.COLUMN_REQUEST_HEADERS)).toMap(),
-                responseHeaders = cursor.getString(cursor.getColumnIndex(RequestInfoTableSchema.COLUMN_RESPONSE_HEADERS)).toMap()
+                requestHeaders = cursor.getString(cursor.getColumnIndex(RequestInfoTableSchema.COLUMN_REQUEST_HEADERS))
+                    .toMap(),
+                responseHeaders = cursor.getString(cursor.getColumnIndex(RequestInfoTableSchema.COLUMN_RESPONSE_HEADERS))
+                    .toMap()
             )
             requests.add(httpResponse)
         }

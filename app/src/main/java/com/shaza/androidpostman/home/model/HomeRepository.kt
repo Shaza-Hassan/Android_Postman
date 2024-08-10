@@ -14,7 +14,7 @@ class HomeRepository(
     private val httpClient: HTTPClient,
     private val addRequestInDB: AddRequestInDB,
     private val connectivityChecker: ConnectivityChecker,
-): HomeGateway {
+) : HomeGateway {
 
     override fun makeRequest(
         url: String,
@@ -24,7 +24,7 @@ class HomeRepository(
         uri: Uri?,
         contentResolver: ContentResolver
     ): NetworkResponse {
-        return httpClient.makeRequest(url, requestType, headers, body,uri,contentResolver)
+        return httpClient.makeRequest(url, requestType, headers, body, uri, contentResolver)
     }
 
     override fun addToDB(networkResponse: NetworkResponse) {

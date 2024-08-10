@@ -1,10 +1,8 @@
 package com.shaza.androidpostman.requestInfo.view
 
 import android.annotation.SuppressLint
-import androidx.fragment.app.viewModels
 import android.os.Bundle
 import android.text.SpannableStringBuilder
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
@@ -12,6 +10,8 @@ import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.text.bold
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.shaza.androidpostman.R
 import com.shaza.androidpostman.databinding.FragmentRequestInfoBinding
 import com.shaza.androidpostman.home.model.RequestType
@@ -24,7 +24,7 @@ class RequestInfoFragment : Fragment() {
     companion object {
         fun newInstance(
             networkResponse: NetworkResponse
-        ) : RequestInfoFragment {
+        ): RequestInfoFragment {
             val fragment = RequestInfoFragment()
             val bundle = Bundle()
             bundle.putParcelable("networkResponse", networkResponse)
@@ -33,12 +33,8 @@ class RequestInfoFragment : Fragment() {
         }
     }
 
-    lateinit var viewModel : RequestInfoViewModelInterface
+    lateinit var viewModel: RequestInfoViewModelInterface
     private lateinit var binding: FragmentRequestInfoBinding
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -65,9 +61,8 @@ class RequestInfoFragment : Fragment() {
         }
     }
 
-    private fun initObservers(){
-        viewModel.networkResponse.observe(viewLifecycleOwner) {
-            response ->
+    private fun initObservers() {
+        viewModel.networkResponse.observe(viewLifecycleOwner) { response ->
             response?.let { response ->
                 requestBasicInfo(response)
                 setRequestTypeData(response)
@@ -108,14 +103,13 @@ class RequestInfoFragment : Fragment() {
     }
 
     private fun handleShowRequestQueryParams(response: NetworkResponse) {
-        response.queryParameters?.let {
-            queryParams ->
+        response.queryParameters?.let { queryParams ->
             if (queryParams.isNotEmpty()) {
                 showView(binding.requestQueryParams)
                 val responseQueryParams = fromMapToString(queryParams)
 
                 setSpannableText(
-                    responseQueryParams ?: "",
+                    responseQueryParams,
                     "Query params: ",
                     binding.requestQueryParams
                 )
@@ -126,14 +120,13 @@ class RequestInfoFragment : Fragment() {
     }
 
     private fun handleShowRequestHeaders(response: NetworkResponse) {
-        response.requestHeaders?.let {
-            requestHeaders ->
+        response.requestHeaders?.let { requestHeaders ->
             if (requestHeaders.isNotEmpty()) {
                 showView(binding.requestHeaders)
                 val responseHeaders = fromMapToString(requestHeaders)
 
                 setSpannableText(
-                    responseHeaders ?: "",
+                    responseHeaders,
                     "Response header: ",
                     binding.requestHeaders
                 )
@@ -181,7 +174,7 @@ class RequestInfoFragment : Fragment() {
         response.responseHeaders?.let {
             showView(binding.responseHeader)
             setSpannableText(
-                response.responseHeaders.toString() ?: "",
+                response.responseHeaders.toString(),
                 "Response headers: ",
                 binding.responseHeader
             )

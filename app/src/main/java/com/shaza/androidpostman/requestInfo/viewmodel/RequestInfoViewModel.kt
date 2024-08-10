@@ -9,8 +9,8 @@ import androidx.lifecycle.ViewModel
 import com.shaza.androidpostman.shared.model.NetworkResponse
 import com.shaza.androidpostman.shared.utils.SdkVersionProvider
 
-class RequestInfoViewModel(private val sdkVersionProvider: SdkVersionProvider = SdkVersionProvider())
-    : ViewModel() , RequestInfoViewModelInterface {
+class RequestInfoViewModel(private val sdkVersionProvider: SdkVersionProvider = SdkVersionProvider()) :
+    ViewModel(), RequestInfoViewModelInterface {
 
 
     private var _networkResponse: MutableLiveData<NetworkResponse> = MutableLiveData()
@@ -29,7 +29,8 @@ class RequestInfoViewModel(private val sdkVersionProvider: SdkVersionProvider = 
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private fun extractDataFromBundle(bundle: Bundle) {
-        _networkResponse.value = bundle.getParcelable("networkResponse",NetworkResponse::class.java)
+        _networkResponse.value =
+            bundle.getParcelable("networkResponse", NetworkResponse::class.java)
     }
 
     @Suppress("DEPRECATION")
