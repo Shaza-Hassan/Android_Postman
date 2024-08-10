@@ -1,6 +1,7 @@
 package com.shaza.androidpostman.home.viewmodel
 
 import android.content.Context
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -32,6 +33,9 @@ class HomeViewModel(
     private val _response = MutableLiveData<Resource<NetworkResponse>>()
     val response: LiveData<Resource<NetworkResponse>> = _response
 
+    private val _selectedFileUri = MutableLiveData<Uri?>()
+    val selectedFileUri: LiveData<Uri?> = _selectedFileUri
+
     init {
         _response.value = Resource.idle()
         _headers.value = mutableListOf()
@@ -60,6 +64,10 @@ class HomeViewModel(
 
     fun setBody(body: String) {
         _body.value = body
+    }
+
+    fun setSelectedFileUri(uri: Uri?) {
+        _selectedFileUri.value = uri
     }
 
     fun onSendRequestClicked() {

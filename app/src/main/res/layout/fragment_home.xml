@@ -114,32 +114,50 @@ xmlns:android="http://schemas.android.com/apk/res/android"
                         app:layout_constraintTop_toBottomOf="@id/text_input_layout_body"
                         app:layout_constraintEnd_toEndOf="parent"
                         android:layout_marginTop="16dp"
-                        style="?attr/materialButtonOutlinedStyle"
                         android:text="@string/select_File_to_upload"
                         android:id="@+id/file_to_upload"/>
 
-                    <ImageView
-                        android:layout_width="200dp"
-                        android:layout_height="200dp"
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/selected_file_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
                         app:layout_constraintTop_toBottomOf="@id/file_to_upload"
-                        android:layout_marginTop="10dp"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        android:scaleType="centerCrop"
-                        android:adjustViewBounds="true"
-                        android:id="@+id/selected_image"
-                        android:visibility="gone"/>
+                        android:visibility="gone">
 
-                    <Button
+                    <TextView
+                        android:id="@+id/selected_file"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="@string/selected_file_name"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:visibility="visible"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"/>
+
+                    <TextView
+                        android:id="@+id/selected_file_name"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        app:layout_constraintEnd_toStartOf="@id/remove_file"
+                        android:layout_marginEnd="10dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/selected_file" />
+
+                    <ImageButton
+                        android:id="@+id/remove_file"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        app:layout_constraintStart_toStartOf="@id/selected_image"
-                        app:layout_constraintEnd_toEndOf="@id/selected_image"
-                        app:layout_constraintTop_toBottomOf="@id/selected_image"
-                        android:id="@+id/remove_image"
-                        style="?attr/materialButtonOutlinedStyle"
-                        android:text="@string/remove_image"
-                        android:visibility="gone"/>
+                        app:layout_constraintTop_toTopOf="@id/selected_file_name"
+                        app:layout_constraintBottom_toBottomOf="@id/selected_file_name"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        android:src="@drawable/baseline_remove_24"
+                        android:background="@android:color/transparent"/>
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 

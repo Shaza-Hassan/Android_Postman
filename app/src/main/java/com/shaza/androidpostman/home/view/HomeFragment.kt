@@ -1,7 +1,11 @@
 package com.shaza.androidpostman.home.view
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.net.Uri
 import androidx.fragment.app.viewModels
 import android.os.Bundle
+import android.provider.OpenableColumns
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +13,8 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.ViewModelProvider
 import com.shaza.androidpostman.R
@@ -34,6 +40,9 @@ class HomeFragment : Fragment() {
 
     companion object {
         fun newInstance() = HomeFragment()
+
+        const val STORAGE_PERMISSION_CODE = 101
+        const val FILE_PICKER_REQUEST_CODE = 102
     }
 
     private lateinit var apiClient: HTTPClient
@@ -97,6 +106,8 @@ class HomeFragment : Fragment() {
 
         onButtonAddFileClick()
 
+        onRemoveFileButtonClicked()
+
         onUrlEditTextChange()
 
         onBodyEditTextChange()
@@ -108,6 +119,12 @@ class HomeFragment : Fragment() {
     }
 
     private fun observeOnResponseResource() {
+        observeOnResponse()
+
+        observeOnSelectedFileUri()
+    }
+
+    private fun observeOnResponse() {
         viewModel.response.observe(viewLifecycleOwner) { resource ->
             when (resource.status) {
                 is ResourceStatus.Error -> {
@@ -141,6 +158,16 @@ class HomeFragment : Fragment() {
                     }
                 }
 
+            }
+        }
+    }
+
+    private fun observeOnSelectedFileUri() {
+        viewModel.selectedFileUri.observe(viewLifecycleOwner) { uri ->
+            uri?.let {
+                handleSelectedFile(it)
+            } ?: run {
+                binding.selectedFileLayout.visibility = GONE
             }
         }
     }
@@ -202,7 +229,20 @@ class HomeFragment : Fragment() {
     }
 
     private fun onButtonAddFileClick() {
+        binding.fileToUpload.setOnClickListener {
+            // check if android version is less than or equal to 32 API
+            if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.S_V2) {
+                requestStoragePermission()
+            } else {
+                openFilePicker()
+            }
+        }
+    }
 
+    private fun onRemoveFileButtonClicked(){
+        binding.removeFile.setOnClickListener {
+            viewModel.setSelectedFileUri(null)
+        }
     }
 
     private fun onUrlEditTextChange() {
@@ -216,4 +256,71 @@ class HomeFragment : Fragment() {
             viewModel.setBody(text.toString())
         }
     }
+
+    private fun requestStoragePermission() {
+        when {
+            ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED -> {
+                openFilePicker()
+            }
+            shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE) -> {
+                // Explain why you need the permission, then request it
+                // E.g., show a dialog and then request the permission
+                requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+            }
+            else -> {
+                // Directly request the permission
+                requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+            }
+        }
+    }
+
+    private fun openFilePicker() {
+        getContentLauncher.launch("*/*") // Set MIME type (e.g., "image/*" for images)
+    }
+
+    private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+        if (isGranted) {
+            openFilePicker()
+        } else {
+            Toast.makeText(requireContext(), "Permission Denied", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private val getContentLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        uri?.let {
+            handleSelectedFile(it)
+        } ?: run {
+            binding.selectedFileLayout.visibility = GONE
+        }
+    }
+
+    private fun handleSelectedFile(uri: Uri) {
+        binding.selectedFileLayout.visibility = VISIBLE
+        binding.selectedFileName.text = getFileNameFromUri(uri)
+    }
+
+    private fun getFileNameFromUri(uri: Uri): String? {
+        var fileName: String? = null
+        val contentResolver = requireContext().contentResolver
+
+        // Check if the Uri is pointing to a content provider
+        if (uri.scheme == "content") {
+            val cursor = contentResolver.query(uri, null, null, null, null)
+            cursor?.use {
+                if (it.moveToFirst()) {
+                    // Try to get the display name from the column
+                    fileName = it.getString(it.getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME))
+                }
+            }
+        }
+
+        // If the Uri is a file Uri, use the path to get the file name
+        if (fileName == null) {
+            fileName = uri.path
+            fileName = fileName?.substring(fileName?.lastIndexOf('/')?.plus(1) ?: 0)
+        }
+
+        return fileName
+    }
+
 }

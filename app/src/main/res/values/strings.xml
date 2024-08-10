@@ -21,4 +21,5 @@
     <string name="success">Success</string>
     <string name="failed">Failed</string>
     <string name="sort_by_execution_time">Sort by execution time</string>
+    <string name="selected_file_name">Selected File name:</string>
 </resources>

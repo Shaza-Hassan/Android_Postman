@@ -21,6 +21,7 @@ uiautomator = "2.3.0"
 mockk = "1.13.12"
 mockkAndroid = "1.13.12"
 mockkAgent = "1.13.12"
+espressoIntents = "3.6.1"
 
 
 [libraries]
@@ -44,6 +45,7 @@ androidx-uiautomator = { group = "androidx.test.uiautomator", name = "uiautomato
 mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 mockk-android = { group = "io.mockk", name = "mockk-android", version.ref = "mockkAndroid" }
 mockk-agent = { group = "io.mockk", name = "mockk-agent", version.ref = "mockkAgent" }
+androidx-espresso-intents = { group = "androidx.test.espresso", name = "espresso-intents", version.ref = "espressoIntents" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
