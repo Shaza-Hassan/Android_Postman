@@ -3,9 +3,13 @@ package com.shaza.androidpostman.home.model
 import com.shaza.androidpostman.shared.database.AddRequestInDB
 import com.shaza.androidpostman.shared.model.NetworkResponse
 import com.shaza.androidpostman.shared.netowrk.HTTPClient
+import com.shaza.androidpostman.shared.utils.ConnectivityChecker
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
+import junit.framework.TestCase.assertFalse
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
@@ -17,12 +21,14 @@ class HomeRepositoryTest {
     private lateinit var homeRepository: HomeRepository
     private lateinit var mockHttpClient: HTTPClient
     private lateinit var addRequestInDB: AddRequestInDB
+    private lateinit var connectivityChecker: ConnectivityChecker
 
     @Before
     fun setUp() {
         mockHttpClient = mockk()
         addRequestInDB = mockk()
-        homeRepository = HomeRepository(mockHttpClient, addRequestInDB)
+        connectivityChecker = mockk()
+        homeRepository = HomeRepository(mockHttpClient, addRequestInDB, connectivityChecker)
     }
 
     @Test
@@ -143,5 +149,24 @@ class HomeRepositoryTest {
         assertEquals(expectedResponse, actualResponse)
     }
 
+    @Test
+    fun `isConnected returns true when ConnectivityChecker indicates connected`() {
+        every { connectivityChecker.isConnected() } returns true
+
+        val result = connectivityChecker.isConnected()
+
+        assertTrue(result)
+        verify { connectivityChecker.isConnected() }
+    }
+
+    @Test
+    fun `isConnected returns false when ConnectivityChecker indicates not connected`() {
+        every { connectivityChecker.isConnected() } returns false
+
+        val result = connectivityChecker.isConnected()
+
+        assertFalse(result)
+        verify { connectivityChecker.isConnected() }
+    }
 
 }

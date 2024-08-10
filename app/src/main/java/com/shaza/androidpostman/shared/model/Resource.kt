@@ -14,7 +14,7 @@ data class Resource<T>(
         fun <T> idle(): Resource<T> = Resource(ResourceStatus.Idle)
         fun <T> loading(): Resource<T> = Resource(ResourceStatus.Loading)
         fun <T> success(data: T): Resource<T> = Resource(ResourceStatus.Success, data)
-        fun <T> error(error: Throwable): Resource<T> = Resource(ResourceStatus.Error(error))
+        fun <T> error(error: Throwable): Resource<T> = Resource(ResourceStatus.Error, error = error)
     }
 
     override fun equals(other: Any?): Boolean {

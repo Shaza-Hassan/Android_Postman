@@ -1,5 +1,6 @@
 package com.shaza.androidpostman.home.viewmodel
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -17,51 +18,59 @@ class HomeViewModel(
 ) : ViewModel() {
 
     private val _url = MutableLiveData<String>()
-     val url: LiveData<String> = _url
+    val url: LiveData<String> = _url
 
     private val _requestType = MutableLiveData<RequestType>()
-     val requestType: LiveData<RequestType> = _requestType
+    val requestType: LiveData<RequestType> = _requestType
 
     private val _headers = MutableLiveData<MutableList<Header>>()
-     val headers: LiveData<MutableList<Header>> = _headers
+    val headers: LiveData<MutableList<Header>> = _headers
 
     private val _body = MutableLiveData<String>()
-     val body: LiveData<String> = _body
+    val body: LiveData<String> = _body
 
     private val _response = MutableLiveData<Resource<NetworkResponse>>()
-     val response: LiveData<Resource<NetworkResponse>> = _response
+    val response: LiveData<Resource<NetworkResponse>> = _response
 
     init {
         _response.value = Resource.idle()
         _headers.value = mutableListOf()
     }
 
-     fun setUrl(url: String) {
+    fun setUrl(url: String) {
         _url.value = url
     }
 
-     fun setRequestType(type: RequestType) {
+    fun setRequestType(type: RequestType) {
         _requestType.value = type
     }
 
-     fun addHeader() {
+    fun addHeader() {
         val header = Header("", "")
         _headers.value?.add(header)
     }
 
-     fun removeHeader(index: Int) {
+    fun removeHeader(index: Int) {
         _headers.value?.removeAt(index)
     }
 
-     fun getHeaders(): List<Header> {
+    fun getHeaders(): List<Header> {
         return _headers.value ?: emptyList()
     }
 
-     fun setBody(body: String) {
+    fun setBody(body: String) {
         _body.value = body
     }
 
-     fun sendRequest() {
+    fun onSendRequestClicked() {
+        if (homeGateway.isConnected()) {
+            sendRequest()
+        } else {
+            _response.postValue(Resource.error(Exception("No internet connection")))
+        }
+    }
+
+    fun sendRequest() {
         // Ensure that you're using the latest state values
         val url = _url.value ?: ""
         val requestType = _requestType.value ?: RequestType.GET
@@ -75,11 +84,11 @@ class HomeViewModel(
             }
         }
 
-         Executors.newSingleThreadExecutor().execute {
+        Executors.newSingleThreadExecutor().execute {
             _response.postValue(Resource.loading())
             val networkResponse = homeGateway.makeRequest(url, requestType, requestHeaders, body)
-             homeGateway.addToDB(networkResponse)
-             _response.postValue(Resource.success(networkResponse))
+            homeGateway.addToDB(networkResponse)
+            _response.postValue(Resource.success(networkResponse))
         }
     }
 }

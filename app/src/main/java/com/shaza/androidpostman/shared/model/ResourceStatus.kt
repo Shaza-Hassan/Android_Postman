@@ -8,5 +8,6 @@ sealed class ResourceStatus {
     data object Idle : ResourceStatus()
     data object Loading : ResourceStatus()
     data object Success : ResourceStatus()
-    data class Error(val error: Throwable) : ResourceStatus()
+    data object Error : ResourceStatus()
+
 }

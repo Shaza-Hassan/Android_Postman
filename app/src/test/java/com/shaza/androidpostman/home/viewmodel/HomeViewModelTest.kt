@@ -12,12 +12,13 @@ import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
+import io.mockk.slot
+import io.mockk.spyk
 import io.mockk.verify
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.Mockito.mock
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
@@ -37,7 +38,7 @@ class HomeViewModelTest {
     @Before
     fun setUp() {
         mockHomeGateway = mockk()
-        viewModel = HomeViewModel(mockHomeGateway)
+        viewModel = spyk(HomeViewModel(mockHomeGateway))
     }
 
     @Test
@@ -82,7 +83,12 @@ class HomeViewModelTest {
         val headers = listOf<Header>()
         val body = ""
         val networkResponse =
-            NetworkResponse(url, requestType, requestHeaders = headers.associate { it.title!! to it.value!! }, body = body)
+            NetworkResponse(
+                url,
+                requestType,
+                requestHeaders = headers.associate { it.title!! to it.value!! },
+                body = body
+            )
 
         viewModel.setBody(body)
         viewModel.response.observeForever(observer)
@@ -113,11 +119,58 @@ class HomeViewModelTest {
         }
 
         // Assert
-        verify { mockHomeGateway.makeRequest(url, requestType, headers.associate { it.title!! to it.value!! }, body) }
+        verify {
+            mockHomeGateway.makeRequest(
+                url,
+                requestType,
+                headers.associate { it.title!! to it.value!! },
+                body
+            )
+        }
         verify { observer.onChanged(Resource.loading()) }
         latch.await(2, TimeUnit.SECONDS) // Wait for the background thread to complete
         verify { observer.onChanged(Resource.success(networkResponse)) }
         verify { mockHomeGateway.addToDB(networkResponse) }
+    }
+
+    @Test
+    fun `onSendRequestClicked calls sendRequest when connected`() {
+        // Arrange
+        every { mockHomeGateway.isConnected() } returns true
+        val sendRequestSlot = slot<Unit>()
+        every { viewModel.sendRequest() } answers {
+            sendRequestSlot.captured = Unit
+        }
+
+        // Act
+        viewModel.onSendRequestClicked()
+
+        // Assert
+        verify { mockHomeGateway.isConnected() }
+        verify { viewModel.sendRequest() }
+        assertEquals(Unit, sendRequestSlot.captured) // Ensure sendRequest was called
+    }
+
+
+    @Test
+    fun `onSendRequestClicked posts error when not connected`() {
+        every { mockHomeGateway.isConnected() } returns false
+
+        viewModel.onSendRequestClicked()
+        val actual = viewModel.response.value
+
+        verify { mockHomeGateway.isConnected() }
+        val expectedResource : Resource<NetworkResponse> = Resource.error(Exception("No internet connection"))
+
+        assertEquals(
+            expectedResource.status,
+            viewModel.response.value?.status
+        )
+
+        assertEquals(
+            expectedResource,
+            actual
+        )
     }
 
 }
