@@ -8,5 +8,5 @@
     <color name="get_response_color">#61affe</color>
     <color name="post_response_color">#49cc90</color>
 
-    <color name="icon_tint">@color/white</color>
+    <color name="icon_tint">@color/black</color>
 </resources>

@@ -224,7 +224,7 @@ class HomeFragment : Fragment() {
             // Send Request
             hideKeyboard(requireActivity())
             binding.progressBar.visibility = VISIBLE
-            viewModel.onSendRequestClicked()
+            viewModel.onSendRequestClicked(requireActivity().contentResolver)
         }
     }
 

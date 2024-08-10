@@ -1,5 +1,7 @@
 package com.shaza.androidpostman.home.model
 
+import android.content.ContentResolver
+import android.net.Uri
 import com.shaza.androidpostman.shared.database.AddRequestInDB
 import com.shaza.androidpostman.shared.model.NetworkResponse
 import com.shaza.androidpostman.shared.netowrk.HTTPClient
@@ -18,9 +20,11 @@ class HomeRepository(
         url: String,
         requestType: RequestType,
         headers: Map<String, String>,
-        body: String?
+        body: String?,
+        uri: Uri?,
+        contentResolver: ContentResolver
     ): NetworkResponse {
-        return httpClient.makeRequest(url, requestType, headers, body)
+        return httpClient.makeRequest(url, requestType, headers, body,uri,contentResolver)
     }
 
     override fun addToDB(networkResponse: NetworkResponse) {

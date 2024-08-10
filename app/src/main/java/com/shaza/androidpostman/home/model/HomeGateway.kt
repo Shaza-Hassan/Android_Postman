@@ -1,5 +1,7 @@
 package com.shaza.androidpostman.home.model
 
+import android.content.ContentResolver
+import android.net.Uri
 import com.shaza.androidpostman.shared.model.NetworkResponse
 
 /**
@@ -10,7 +12,9 @@ interface HomeGateway {
         url: String,
         requestType: RequestType,
         headers: Map<String, String>,
-        body: String? = null
+        body: String? = null,
+        uri: Uri? = null,
+        contentResolver: ContentResolver
     ): NetworkResponse
 
     fun addToDB(networkResponse: NetworkResponse)

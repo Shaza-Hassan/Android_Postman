@@ -1,5 +1,6 @@
 package com.shaza.androidpostman.home.viewmodel
 
+import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
 import android.util.Log
@@ -70,15 +71,15 @@ class HomeViewModel(
         _selectedFileUri.value = uri
     }
 
-    fun onSendRequestClicked() {
+    fun onSendRequestClicked(contentResolver: ContentResolver) {
         if (homeGateway.isConnected()) {
-            sendRequest()
+            sendRequest(contentResolver)
         } else {
             _response.postValue(Resource.error(Exception("No internet connection")))
         }
     }
 
-    fun sendRequest() {
+    fun sendRequest(contentResolver: ContentResolver) {
         // Ensure that you're using the latest state values
         val url = _url.value ?: ""
         val requestType = _requestType.value ?: RequestType.GET
@@ -94,7 +95,7 @@ class HomeViewModel(
 
         Executors.newSingleThreadExecutor().execute {
             _response.postValue(Resource.loading())
-            val networkResponse = homeGateway.makeRequest(url, requestType, requestHeaders, body)
+            val networkResponse = homeGateway.makeRequest(url, requestType, requestHeaders, body, _selectedFileUri.value, contentResolver)
             homeGateway.addToDB(networkResponse)
             _response.postValue(Resource.success(networkResponse))
         }

@@ -1,5 +1,7 @@
 package com.shaza.androidpostman.shared.netowrk
 
+import android.content.ContentResolver
+import android.net.Uri
 import com.shaza.androidpostman.home.model.RequestType
 import com.shaza.androidpostman.shared.model.NetworkResponse
 
@@ -12,7 +14,9 @@ class APIClient : HTTPClient {
         url: String,
         requestType: RequestType,
         headers: Map<String, String>,
-        body: String?
+        body: String?,
+        uri: Uri?,
+        contentResolver: ContentResolver
     ): NetworkResponse {
         val startTime = System.currentTimeMillis()
         var response: NetworkResponse? = null
@@ -20,7 +24,12 @@ class APIClient : HTTPClient {
 
             val connection = ConnectionManager.createConnection(url, requestType)
             RequestHandler.applyHeaders(connection, headers)
-            RequestHandler.appendBodyIfPost(requestType, body, connection)
+            body?.let {
+                RequestHandler.appendBodyIfPost(requestType, body, connection)
+            }
+            uri?.let {
+                RequestHandler.uploadFile(requestType, uri, connection,contentResolver)
+            }
             response = ResponseHandler.handleResponse(headers,body,connection)
             response.queryParameters = UrlUtils.extractQueryParams(url)
         } catch (e: Exception) {
