@@ -1,5 +1,9 @@
 package com.shaza.androidpostman.home.view
 
+import android.app.Activity
+import android.app.Instrumentation
+import android.content.Intent
+import android.net.Uri
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
@@ -9,6 +13,9 @@ import androidx.test.espresso.action.ViewActions.scrollTo
 import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.RecyclerViewActions.actionOnItemAtPosition
+import androidx.test.espresso.intent.Intents
+import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
+import androidx.test.espresso.intent.matcher.IntentMatchers.hasType
 import androidx.test.espresso.matcher.ViewMatchers.hasDescendant
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
@@ -19,6 +26,9 @@ import com.shaza.androidpostman.MainActivity
 import com.shaza.androidpostman.R
 import com.shaza.androidpostman.utils.typeTextInChildViewWithId
 import org.hamcrest.CoreMatchers.not
+import org.hamcrest.Matchers.allOf
+import org.junit.After
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -32,6 +42,16 @@ class HomeFragmentTest {
 
     @get:Rule
     val activityRule = ActivityScenarioRule(MainActivity::class.java) // Replace with your activity that contains HomeFragment
+
+    @Before
+    fun setUp() {
+        Intents.init()
+    }
+
+    @After
+    fun teardown() {
+        Intents.release()
+    }
 
     @Test
     fun testOnHistoryButtonClicked(){
@@ -148,6 +168,44 @@ class HomeFragmentTest {
         onView(withId(R.id.send_request)).perform(click(), closeSoftKeyboard())
         onView(withId(R.id.progress_bar)).check(matches(isDisplayed()))
 
+    }
+
+    @Test
+    fun handlePostRequestWithSelectFile(){
+        onView(withId(R.id.post_button)).perform(click())
+        onView(withId(R.id.url_edit_text)).perform(typeText("https://dummyjson.com/posts/add"), closeSoftKeyboard())
+        val mockFileUri = Uri.parse("content://path/to/mock/file.text")
+        val resultData = Intent().apply {
+            data = mockFileUri
+        }
+        val result = Instrumentation.ActivityResult(Activity.RESULT_OK, resultData)
+
+        Intents.intending(allOf(
+            hasAction(Intent.ACTION_GET_CONTENT),
+            hasType("*/*")
+        )).respondWith(result)
+
+        onView(withId(R.id.file_to_upload)).perform(scrollTo(), click())
+    }
+
+    @Test
+    fun handlePostRequestWithSelectFileAndRemoveIt(){
+        onView(withId(R.id.post_button)).perform(scrollTo(), click())
+        onView(withId(R.id.url_edit_text)).perform(scrollTo(), typeText("https://dummyjson.com/posts/add"), closeSoftKeyboard())
+        val mockFileUri = Uri.parse("content://path/to/mock/file.text")
+        val resultData = Intent().apply {
+            data = mockFileUri
+        }
+        val result = Instrumentation.ActivityResult(Activity.RESULT_OK, resultData)
+
+        Intents.intending(allOf(
+            hasAction(Intent.ACTION_GET_CONTENT),
+            hasType("*/*")
+        )).respondWith(result)
+
+        onView(withId(R.id.file_to_upload)).perform(scrollTo(), click())
+        onView(withId(R.id.remove_file)).perform(scrollTo(),click())
+        onView(withId(R.id.selected_file_layout)).check(matches(not(isDisplayed())))
     }
 }
 
