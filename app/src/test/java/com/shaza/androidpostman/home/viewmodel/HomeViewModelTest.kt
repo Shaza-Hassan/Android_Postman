@@ -1,5 +1,7 @@
 package com.shaza.androidpostman.home.viewmodel
 
+import android.content.ContentResolver
+import android.net.Uri
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import com.shaza.androidpostman.home.model.Header
@@ -34,11 +36,14 @@ class HomeViewModelTest {
     private lateinit var viewModel: HomeViewModel
     private lateinit var mockHomeGateway: HomeGateway
     private val observer = mockk<Observer<Resource<NetworkResponse>>>(relaxed = true)
-
+    private lateinit var contentResolver: ContentResolver
+    private lateinit var uri: Uri
     @Before
     fun setUp() {
         mockHomeGateway = mockk()
         viewModel = spyk(HomeViewModel(mockHomeGateway))
+        contentResolver = mockk()
+        uri = mockk()
     }
 
     @Test
@@ -56,23 +61,23 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun setBody_updatesLiveData() {
+    fun `set body`() {
         val testBody = "test body"
         viewModel.setBody(testBody)
         assertEquals(testBody, viewModel.body.value)
     }
 
     @Test
-    fun addHeader_addsHeaderToList() {
+    fun `add header to header list`() {
         viewModel.addHeader()
-        assertEquals(1, viewModel.getHeaders().size)
+        assertEquals(1, viewModel.headers.value?.size)
     }
 
     @Test
-    fun removeHeader_removesHeaderFromList() {
+    fun `remove header from header list`() {
         viewModel.addHeader()
         viewModel.removeHeader(0)
-        assertEquals(0, viewModel.getHeaders().size)
+        assertEquals(0, viewModel.headers.value?.size)
     }
 
     @Test
@@ -98,7 +103,7 @@ class HomeViewModelTest {
                 url,
                 requestType,
                 headers.associate { it.title!! to it.value!! },
-                body
+                body,null, contentResolver
             )
         } returns networkResponse
         every { mockHomeGateway.addToDB(networkResponse) } just Runs
@@ -108,7 +113,7 @@ class HomeViewModelTest {
         viewModel.setRequestType(requestType)
 
         // Act
-        viewModel.sendRequest()
+        viewModel.sendRequest(contentResolver)
 
         val latch = CountDownLatch(1) // To wait for the background thread to finish
 
@@ -124,7 +129,7 @@ class HomeViewModelTest {
                 url,
                 requestType,
                 headers.associate { it.title!! to it.value!! },
-                body
+                body,null, contentResolver
             )
         }
         verify { observer.onChanged(Resource.loading()) }
@@ -138,16 +143,16 @@ class HomeViewModelTest {
         // Arrange
         every { mockHomeGateway.isConnected() } returns true
         val sendRequestSlot = slot<Unit>()
-        every { viewModel.sendRequest() } answers {
+        every { viewModel.sendRequest(contentResolver) } answers {
             sendRequestSlot.captured = Unit
         }
 
         // Act
-        viewModel.onSendRequestClicked()
+        viewModel.onSendRequestClicked(contentResolver)
 
         // Assert
         verify { mockHomeGateway.isConnected() }
-        verify { viewModel.sendRequest() }
+        verify { viewModel.sendRequest(contentResolver) }
         assertEquals(Unit, sendRequestSlot.captured) // Ensure sendRequest was called
     }
 
@@ -156,7 +161,7 @@ class HomeViewModelTest {
     fun `onSendRequestClicked posts error when not connected`() {
         every { mockHomeGateway.isConnected() } returns false
 
-        viewModel.onSendRequestClicked()
+        viewModel.onSendRequestClicked(contentResolver)
         val actual = viewModel.response.value
 
         verify { mockHomeGateway.isConnected() }
@@ -171,6 +176,189 @@ class HomeViewModelTest {
             expectedResource,
             actual
         )
+    }
+
+    @Test
+    fun `test setSelectedFileUri`() {
+        val testUri = Uri.parse("http://example.com")
+        viewModel.setSelectedFileUri(testUri)
+        assertEquals(testUri, viewModel.selectedFileUri.value)
+    }
+
+    @Test
+    fun `test send uri when making calling api`() {
+        // Arrange
+        val url = "http://example.com"
+        val requestType = RequestType.GET
+        val headers = listOf<Header>()
+        val body = ""
+        val networkResponse =
+            NetworkResponse(
+                url,
+                requestType,
+                requestHeaders = headers.associate { it.title!! to it.value!! },
+                body = body
+            )
+
+        viewModel.setBody(body)
+        viewModel.response.observeForever(observer)
+
+        every {
+            mockHomeGateway.makeRequest(
+                url,
+                requestType,
+                headers.associate { it.title!! to it.value!! },
+                body, uri, contentResolver
+            )
+        } returns networkResponse
+        every { mockHomeGateway.addToDB(networkResponse) } just Runs
+
+        // Set ViewModel state
+        viewModel.setUrl(url)
+        viewModel.setRequestType(requestType)
+        viewModel.setSelectedFileUri(uri)
+
+        // Act
+        viewModel.sendRequest(contentResolver)
+
+        val latch = CountDownLatch(1) // To wait for the background thread to finish
+
+        every { observer.onChanged(any()) } answers {
+            if (firstArg<Resource<NetworkResponse>>().status == ResourceStatus.Success) {
+                latch.countDown() // Release the latch when success is posted
+            }
+        }
+
+        // Assert
+        verify {
+            mockHomeGateway.makeRequest(
+                url,
+                requestType,
+                headers.associate { it.title!! to it.value!! },
+                body, uri, contentResolver
+            )
+        }
+        verify { observer.onChanged(Resource.loading()) }
+        latch.await(2, TimeUnit.SECONDS) // Wait for the background thread to complete
+        verify { observer.onChanged(Resource.success(networkResponse)) }
+        verify { mockHomeGateway.addToDB(networkResponse) }
+    }
+
+    @Test
+    fun `test send body when making calling api`(){
+        // Arrange
+        val url = "http://example.com"
+        val requestType = RequestType.POST
+        val headers = listOf<Header>()
+        val body = "test body"
+        val networkResponse =
+            NetworkResponse(
+                url,
+                requestType,
+                requestHeaders = headers.associate { it.title!! to it.value!! },
+                body = body
+            )
+
+        viewModel.setBody(body)
+        viewModel.response.observeForever(observer)
+
+        every {
+            mockHomeGateway.makeRequest(
+                url,
+                requestType,
+                headers.associate { it.title!! to it.value!! },
+                body, null, contentResolver
+            )
+        } returns networkResponse
+        every { mockHomeGateway.addToDB(networkResponse) } just Runs
+
+        // Set ViewModel state
+        viewModel.setUrl(url)
+        viewModel.setRequestType(requestType)
+
+        // Act
+        viewModel.sendRequest(contentResolver)
+
+        val latch = CountDownLatch(1) // To wait for the background thread to finish
+
+        every { observer.onChanged(any()) } answers {
+            if (firstArg<Resource<NetworkResponse>>().status == ResourceStatus.Success) {
+                latch.countDown() // Release the latch when success is posted
+            }
+        }
+
+        // Assert
+        verify {
+            mockHomeGateway.makeRequest(
+                url,
+                requestType,
+                headers.associate { it.title!! to it.value!! },
+                body, null, contentResolver
+            )
+        }
+        verify { observer.onChanged(Resource.loading()) }
+        latch.await(2, TimeUnit.SECONDS) // Wait for the background thread to complete
+        verify { observer.onChanged(Resource.success(networkResponse)) }
+        verify { mockHomeGateway.addToDB(networkResponse) }
+    }
+
+    @Test
+    fun `test set headers when calling api`(){
+        // Arrange
+        val url = "http://example.com"
+        val requestType = RequestType.POST
+        val headers = listOf(Header("key1", "value1"), Header("key2", "value2"))
+        val body = "test body"
+        val networkResponse =
+            NetworkResponse(
+                url,
+                requestType,
+                requestHeaders = headers.associate { it.title!! to it.value!! },
+                body = body
+            )
+
+        viewModel.setBody(body)
+        viewModel.response.observeForever(observer)
+
+        every {
+            mockHomeGateway.makeRequest(
+                url,
+                requestType,
+                headers.associate { it.title!! to it.value!! },
+                body, null, contentResolver
+            )
+        } returns networkResponse
+        every { mockHomeGateway.addToDB(networkResponse) } just Runs
+
+        // Set ViewModel state
+        viewModel.setUrl(url)
+        viewModel.setRequestType(requestType)
+        viewModel.setHeaders(headers)
+
+        // Act
+        viewModel.sendRequest(contentResolver)
+
+        val latch = CountDownLatch(1) // To wait for the background thread to finish
+
+        every { observer.onChanged(any()) } answers {
+            if (firstArg<Resource<NetworkResponse>>().status == ResourceStatus.Success) {
+                latch.countDown() // Release the latch when success is posted
+            }
+        }
+
+        // Assert
+        verify {
+            mockHomeGateway.makeRequest(
+                url,
+                requestType,
+                headers.associate { it.title!! to it.value!! },
+                body, null, contentResolver
+            )
+        }
+        verify { observer.onChanged(Resource.loading()) }
+        latch.await(2, TimeUnit.SECONDS) // Wait for the background thread to complete
+        verify { observer.onChanged(Resource.success(networkResponse)) }
+        verify { mockHomeGateway.addToDB(networkResponse) }
     }
 
 }

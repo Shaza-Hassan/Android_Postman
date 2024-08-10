@@ -1,5 +1,7 @@
 package com.shaza.androidpostman.home.model
 
+import android.content.ContentResolver
+import android.net.Uri
 import com.shaza.androidpostman.shared.database.AddRequestInDB
 import com.shaza.androidpostman.shared.model.NetworkResponse
 import com.shaza.androidpostman.shared.netowrk.HTTPClient
@@ -22,13 +24,16 @@ class HomeRepositoryTest {
     private lateinit var mockHttpClient: HTTPClient
     private lateinit var addRequestInDB: AddRequestInDB
     private lateinit var connectivityChecker: ConnectivityChecker
-
+    private lateinit var contentResolver: ContentResolver
+    private lateinit var uri: Uri
     @Before
     fun setUp() {
         mockHttpClient = mockk()
         addRequestInDB = mockk()
         connectivityChecker = mockk()
         homeRepository = HomeRepository(mockHttpClient, addRequestInDB, connectivityChecker)
+        contentResolver = mockk()
+        uri = mockk()
     }
 
     @Test
@@ -47,10 +52,10 @@ class HomeRepositoryTest {
             response = "response body"
         )
 
-        every { mockHttpClient.makeRequest(url,requestType,headers,body) } returns expectedResponse
+        every { mockHttpClient.makeRequest(url,requestType,headers,body,uri, contentResolver) } returns expectedResponse
 
         // Act
-        val actualResponse = homeRepository.makeRequest(url, requestType, headers, body)
+        val actualResponse = homeRepository.makeRequest(url, requestType, headers, body,uri, contentResolver)
 
         // Assert
         assertEquals(expectedResponse, actualResponse)
@@ -71,11 +76,10 @@ class HomeRepositoryTest {
             responseCode = 200,
             response = "POST response body"
         )
-//            NetworkResponse.Success("POST response body")
-        every { mockHttpClient.makeRequest(url,requestType,headers,body) } returns expectedResponse
+        every { mockHttpClient.makeRequest(url,requestType,headers,body,uri, contentResolver) } returns expectedResponse
 
         // Act
-        val actualResponse = homeRepository.makeRequest(url, requestType, headers, body)
+        val actualResponse = homeRepository.makeRequest(url, requestType, headers, body,uri, contentResolver)
 
         // Assert
         assertEquals(expectedResponse, actualResponse)
@@ -90,10 +94,10 @@ class HomeRepositoryTest {
         val body = null
 
         // Mock the behavior of the HTTPClient to throw an exception
-        every { mockHttpClient.makeRequest(url,requestType,headers,body) } throws Exception("Network error")
+        every { mockHttpClient.makeRequest(url,requestType,headers,body,uri, contentResolver) } throws Exception("Network error")
 
         // Act
-        homeRepository.makeRequest(url, requestType, headers, body)
+        homeRepository.makeRequest(url, requestType, headers, body,uri, contentResolver)
     }
 
     @Test
@@ -113,10 +117,10 @@ class HomeRepositoryTest {
         )
 
         // Mock the behavior of the HTTPClient to return an error response
-        every { mockHttpClient.makeRequest(url,requestType,headers,body) } returns expectedResponse
+        every { mockHttpClient.makeRequest(url,requestType,headers,body,uri, contentResolver) } returns expectedResponse
 
         // Act
-        val actualResponse = homeRepository.makeRequest(url, requestType, headers, body)
+        val actualResponse = homeRepository.makeRequest(url, requestType, headers, body,uri, contentResolver)
 
         // Assert
         assertEquals(expectedResponse, actualResponse)
@@ -140,10 +144,10 @@ class HomeRepositoryTest {
         )
 
         // Mock the behavior of the HTTPClient to return an error response
-        every { mockHttpClient.makeRequest(url,requestType,headers,body) } returns expectedResponse
+        every { mockHttpClient.makeRequest(url,requestType,headers,body,uri, contentResolver) } returns expectedResponse
 
         // Act
-        val actualResponse = homeRepository.makeRequest(url, requestType, headers, body)
+        val actualResponse = homeRepository.makeRequest(url, requestType, headers, body,uri, contentResolver)
 
         // Assert
         assertEquals(expectedResponse, actualResponse)
@@ -167,6 +171,50 @@ class HomeRepositoryTest {
 
         assertFalse(result)
         verify { connectivityChecker.isConnected() }
+    }
+
+    @Test
+    fun `addRequest should call AddRequestInDB`() {
+        // Arrange
+        val request = NetworkResponse(
+            url = "https://example.com",
+            requestType = RequestType.GET,
+            requestHeaders = mapOf("Authorization" to "Bearer token"),
+            body = null
+        )
+
+        every { addRequestInDB.addRequestToDataBase(request) } returns Unit
+
+        // Act
+        homeRepository.addToDB(request)
+
+        // Assert
+        verify { addRequestInDB.addRequestToDataBase(request) }
+    }
+
+    @Test
+    fun `make request should handle uri`() {
+        // Arrange
+        val url = "https://example.com"
+        val requestType = RequestType.GET
+        val headers = mapOf("Authorization" to "Bearer token")
+        val body = null
+        val expectedResponse = NetworkResponse(
+            url = url,
+            requestType = requestType,
+            requestHeaders = headers,
+            body = body,
+            responseCode = 200,
+            response = "response body"
+        )
+
+        every { mockHttpClient.makeRequest(url,requestType,headers,body,uri, contentResolver) } returns expectedResponse
+
+        // Act
+        val actualResponse = homeRepository.makeRequest(url, requestType, headers, body,uri, contentResolver)
+
+        // Assert
+        assertEquals(expectedResponse, actualResponse)
     }
 
 }

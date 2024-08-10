@@ -55,6 +55,10 @@ class HomeViewModel(
         _headers.value?.add(header)
     }
 
+    fun setHeaders(headers: List<Header>) {
+        _headers.value = headers.toMutableList()
+    }
+
     fun removeHeader(index: Int) {
         _headers.value?.removeAt(index)
     }
