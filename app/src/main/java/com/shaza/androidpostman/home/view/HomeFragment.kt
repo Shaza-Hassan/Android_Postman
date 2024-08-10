@@ -60,6 +60,12 @@ class HomeFragment : Fragment() {
         return binding.root
     }
 
+    override fun onResume() {
+        super.onResume()
+        hideKeyboard(requireActivity())
+
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         apiClient = APIClient()
@@ -290,7 +296,7 @@ class HomeFragment : Fragment() {
     private val getContentLauncher =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
             uri?.let {
-                handleSelectedFile(it)
+                viewModel.setSelectedFileUri(uri)
             } ?: run {
                 binding.selectedFileLayout.visibility = GONE
             }

@@ -18,6 +18,7 @@ import com.shaza.androidpostman.home.model.RequestType
 import com.shaza.androidpostman.requestInfo.viewmodel.RequestInfoViewModel
 import com.shaza.androidpostman.requestInfo.viewmodel.RequestInfoViewModelInterface
 import com.shaza.androidpostman.shared.model.NetworkResponse
+import com.shaza.androidpostman.shared.utils.hideKeyboard
 
 class RequestInfoFragment : Fragment() {
 
@@ -42,6 +43,11 @@ class RequestInfoFragment : Fragment() {
     ): View {
         binding = FragmentRequestInfoBinding.inflate(inflater, container, false)
         return binding.root
+    }
+
+    override fun onResume() {
+        super.onResume()
+        hideKeyboard(requireActivity())
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

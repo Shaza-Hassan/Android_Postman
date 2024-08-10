@@ -22,6 +22,7 @@ import com.shaza.androidpostman.shared.database.SelectFromDB
 import com.shaza.androidpostman.shared.database.WhereClauses
 import com.shaza.androidpostman.shared.model.NetworkResponse
 import com.shaza.androidpostman.shared.model.ResourceStatus
+import com.shaza.androidpostman.shared.utils.hideKeyboard
 
 class HistoryFragment : Fragment() {
 
@@ -40,6 +41,11 @@ class HistoryFragment : Fragment() {
     ): View {
         binding = FragmentHistoryBinding.inflate(inflater, container, false)
         return binding.root
+    }
+
+    override fun onResume() {
+        super.onResume()
+        hideKeyboard(requireActivity())
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

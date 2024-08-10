@@ -27,7 +27,6 @@ import org.junit.runner.RunWith
  */
 
 @RunWith(AndroidJUnit4::class)
-
 class RequestInfoFragmentTest {
 
     private lateinit var fragmentScenario: FragmentScenario<RequestInfoFragment>
